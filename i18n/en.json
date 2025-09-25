@@ -34,5 +34,213 @@
       }
     ],
     "categoriesTitle": "Choose your path"
+  },
+  "booking": {
+    "title": "Book your sessions",
+    "description": "Choose your course, difficulty, and topics to get an exact quote with smart discount guidance.",
+    "summaryButton": "View booking summary",
+    "emptyCourses": {
+      "title": "No courses available",
+      "description": "Please contact the team to add new courses."
+    },
+    "placementOptions": {
+      "KNOWN_LEVEL": "I know my level",
+      "PLACEMENT_TEST": "I need a placement test",
+      "DISCOVERY_CALL": "I want a discovery call"
+    },
+    "form": {
+      "course": {
+        "title": "Choose a course",
+        "description": "Select the course that matches your goals."
+      },
+      "difficulty": {
+        "title": "Difficulty",
+        "description": "Pick a level to reveal the session rate."
+      },
+      "topics": {
+        "title": "Topics",
+        "description": "Toggle the topics you want to cover to calculate session count.",
+        "empty": "No topics are available for this difficulty yet.",
+        "chipTemplate": "{{name}} · {{sessions}} sessions"
+      },
+      "details": {
+        "title": "Additional details",
+        "description": "Choose how we determine your level and add your preferred time.",
+        "placementQuestion": "How should we determine your level?",
+        "levelLabel": "Current level",
+        "levelPlaceholder": "Example: Intermediate B1",
+        "slotLabel": "Preferred time (local timezone)",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Share goals or preferences that help us prepare."
+      },
+      "summary": {
+        "title": "Booking summary",
+        "description": "Review your selection before confirming.",
+        "sessionsLabel": "Total sessions",
+        "subtotalLabel": "Subtotal",
+        "discountLabel": "Discount",
+        "finalLabel": "Final amount",
+        "couponLabel": "Coupon code",
+        "couponPlaceholder": "Enter coupon",
+        "couponCheck": "Validate",
+        "upsellTemplate": "Add {{sessions}} more sessions to unlock {{percent}}% off and save {{savings}}"
+      },
+      "actions": {
+        "confirm": "Confirm booking",
+        "confirming": "Confirming..."
+      }
+    },
+    "toast": {
+      "success": "Your sessions are confirmed",
+      "reference": "Booking ID {{id}}"
+    },
+    "errors": {
+      "pricingFailed": "Failed to calculate pricing",
+      "bookingFailed": "Failed to create the booking"
+    }
+  },
+  "admin": {
+    "nav": {
+      "overview": "Overview",
+      "appointments": "Appointments",
+      "calendar": "Calendar",
+      "catalog": "Catalog",
+      "reports": "Reports",
+      "cashBooking": "Cash bookings",
+      "users": "Learners"
+    },
+    "roles": {
+      "ADMIN": "Admin",
+      "LEARNER": "Learner"
+    },
+    "layout": {
+      "greeting": "Welcome",
+      "role": "Role"
+    },
+    "overview": {
+      "title": "Dashboard",
+      "description": "A quick snapshot of current performance and activity.",
+      "stats": {
+        "courses": {
+          "title": "Active courses",
+          "description": "Courses currently published"
+        },
+        "bookings": {
+          "title": "Bookings",
+          "description": "Total confirmed bookings"
+        },
+        "learners": {
+          "title": "Learners",
+          "description": "Registered learners on the platform"
+        },
+        "revenue": {
+          "title": "Cash revenue",
+          "description": "Confirmed revenue collected in cash"
+        }
+      },
+      "quickActionsTitle": "Quick actions",
+      "quickActionsDescription": "Start by adding a course or reviewing pending sessions.",
+      "quickActions": {
+        "cashBooking": "Create cash booking",
+        "manageAppointments": "Manage appointments"
+      }
+    },
+    "catalog": {
+      "title": "Catalog management",
+      "description": "Maintain courses, difficulties, and topics in one workspace.",
+      "createCourse": {
+        "title": "Create a course",
+        "nameLabel": "Course name",
+        "descriptionLabel": "Description",
+        "categoryLabel": "Category",
+        "typeLabel": "Course type",
+        "typeOptions": {
+          "PRIVATE": "Private",
+          "CLASSROOM": "Classroom"
+        },
+        "submit": "Save course"
+      },
+      "updateCourse": {
+        "editAction": "Edit",
+        "saveAction": "Save",
+        "cancelAction": "Cancel"
+      },
+      "courseMeta": {
+        "type": "Course type",
+        "category": "Category"
+      },
+      "difficulty": {
+        "title": "Difficulties",
+        "existingTitle": "Active difficulty levels with session pricing.",
+        "priceLabel": "Session price (USD)",
+        "addTitle": "Add difficulty",
+        "labelPlaceholder": "Select level",
+        "pricePlaceholder": "e.g. 25",
+        "submit": "Add difficulty",
+        "labels": {
+          "BEGINNER": "Beginner",
+          "INTERMEDIATE": "Intermediate",
+          "ADVANCED": "Advanced"
+        }
+      },
+      "topics": {
+        "title": "Topics",
+        "empty": "No topics have been added yet.",
+        "addButton": "Add topic",
+        "formTitle": "New topic",
+        "nameLabel": "Topic name",
+        "descriptionLabel": "Description",
+        "sessionsLabel": "Sessions",
+        "hoursLabel": "Estimated hours",
+        "orderLabel": "Order",
+        "submit": "Save",
+        "cancel": "Cancel",
+        "editAction": "Edit",
+        "moveUp": "Move up",
+        "moveDown": "Move down"
+      },
+      "feedback": {
+        "courseCreated": "Course created",
+        "courseUpdated": "Course updated",
+        "difficultyCreated": "Difficulty added",
+        "difficultyUpdated": "Difficulty pricing updated",
+        "topicCreated": "Topic created",
+        "topicUpdated": "Topic updated",
+        "reorderSuccess": "Topic order updated",
+        "errorGeneric": "Something went wrong. Please try again."
+      },
+      "table": {
+        "perSession": "Price per session"
+      }
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Track scheduled sessions in weekly or monthly layouts.",
+      "weekView": "Week",
+      "monthView": "Month",
+      "previous": "Previous",
+      "next": "Next",
+      "weekOf": "Week of",
+      "monthOf": "Month of",
+      "noSessions": "No sessions",
+      "sessionAt": "Time"
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Monitor financial performance and session operations.",
+      "revenueCard": "Cash revenue",
+      "revenueDescription": "Total confirmed cash payments.",
+      "bookedCard": "Booked sessions",
+      "bookedDescription": "Scheduled or rescheduled sessions.",
+      "doneCard": "Completed sessions",
+      "doneDescription": "Sessions delivered successfully.",
+      "canceledCard": "Canceled / no-show",
+      "canceledDescription": "Sessions that did not take place.",
+      "discountsCard": "Discount usage",
+      "discountsDescription": "Total value of applied discounts.",
+      "utilizationCard": "Utilization",
+      "utilizationDescription": "How well booked hours are fulfilled.",
+      "utilizationDetail": "Completed {{completed}} of {{scheduled}} hours ({{percentage}}%)."
+    }
   }
 }

@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getDictionary, getLocale } from "@/lib/i18n";
+import type { AdminDictionary } from "@/lib/types/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverviewPage() {
+  const locale = await getLocale();
+  const dictionary = await getDictionary(locale);
+
   let stats = {
     courses: 0,
     bookings: 0,
@@ -29,22 +34,35 @@ export default async function AdminOverviewPage() {
     console.error("Failed to load admin stats", error);
   }
 
+  const copy = dictionary.admin.overview as AdminDictionary["overview"];
   const cards = [
-    { title: "عدد الدورات", value: stats.courses.toLocaleString(), description: "الدورات النشطة في المنصة" },
-    { title: "الحجوزات", value: stats.bookings.toLocaleString(), description: "إجمالي الحجوزات المؤكدة" },
-    { title: "المتعلمون", value: stats.learners.toLocaleString(), description: "عدد المتعلمين المسجلين" },
     {
-      title: "إيراد نقدي",
-      value: stats.revenue.toLocaleString("ar-LB", { style: "currency", currency: "USD" }),
-      description: "الإيرادات المؤكدة عبر المدفوعات النقدية",
+      title: copy.stats.courses.title,
+      value: stats.courses.toLocaleString(locale),
+      description: copy.stats.courses.description,
+    },
+    {
+      title: copy.stats.bookings.title,
+      value: stats.bookings.toLocaleString(locale),
+      description: copy.stats.bookings.description,
+    },
+    {
+      title: copy.stats.learners.title,
+      value: stats.learners.toLocaleString(locale),
+      description: copy.stats.learners.description,
+    },
+    {
+      title: copy.stats.revenue.title,
+      value: stats.revenue.toLocaleString(locale, { style: "currency", currency: "USD" }),
+      description: copy.stats.revenue.description,
     },
   ];
 
   return (
     <section className="space-y-8">
       <div className="rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
-        <h1 className="font-display text-3xl text-brand-800">لوحة التحكم</h1>
-        <p className="text-brand-600">نظرة سريعة على الأداء والأنشطة الحالية.</p>
+        <h1 className="font-display text-3xl text-brand-800">{copy.title}</h1>
+        <p className="text-brand-600">{copy.description}</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
@@ -60,14 +78,14 @@ export default async function AdminOverviewPage() {
         ))}
       </div>
       <div className="rounded-3xl bg-brand-800 p-6 text-white">
-        <h2 className="font-display text-2xl">مهام سريعة</h2>
-        <p className="mt-2 text-brand-50/80">ابدأ بإضافة دورة جديدة أو مراجعة الحجوزات المعلقة.</p>
+        <h2 className="font-display text-2xl">{copy.quickActionsTitle}</h2>
+        <p className="mt-2 text-brand-50/80">{copy.quickActionsDescription}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button asChild variant="outline" className="border-white/40 text-white hover:bg-white/10">
-            <a href="/admin/cash-booking">إنشاء حجز نقدي</a>
+            <a href="/admin/cash-booking">{copy.quickActions.cashBooking}</a>
           </Button>
           <Button asChild className="bg-white text-brand-800 hover:bg-brand-100">
-            <a href="/admin/appointments">إدارة المواعيد</a>
+            <a href="/admin/appointments">{copy.quickActions.manageAppointments}</a>
           </Button>
         </div>
       </div>

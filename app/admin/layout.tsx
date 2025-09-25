@@ -1,15 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
 
-const navItems = [
-  { href: "/admin", label: "نظرة عامة" },
-  { href: "/admin/appointments", label: "المواعيد" },
-  { href: "/admin/calendar", label: "التقويم" },
-  { href: "/admin/reports", label: "التقارير" },
-  { href: "/admin/cash-booking", label: "حجوزات نقدية" },
-  { href: "/admin/users", label: "المتعلمون" },
-];
+import { getCurrentUser } from "@/lib/auth";
+import { getDictionary, getLocale } from "@/lib/i18n";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -17,14 +10,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/login");
   }
 
+  const locale = await getLocale();
+  const dictionary = await getDictionary(locale);
+  const navItems = [
+    { href: "/admin", label: dictionary.admin.nav.overview },
+    { href: "/admin/appointments", label: dictionary.admin.nav.appointments },
+    { href: "/admin/calendar", label: dictionary.admin.nav.calendar },
+    { href: "/admin/catalog", label: dictionary.admin.nav.catalog },
+    { href: "/admin/reports", label: dictionary.admin.nav.reports },
+    { href: "/admin/cash-booking", label: dictionary.admin.nav.cashBooking },
+    { href: "/admin/users", label: dictionary.admin.nav.users },
+  ];
+
   return (
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
       <aside className="h-fit rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
         <div className="space-y-6">
           <div>
-            <p className="text-sm text-brand-500">مرحباً</p>
+            <p className="text-sm text-brand-500">{dictionary.admin.layout.greeting}</p>
             <p className="font-display text-xl text-brand-800">{user.name ?? user.email}</p>
-            <p className="text-xs text-brand-400">دور: {user.role}</p>
+            <p className="text-xs text-brand-400">
+              {dictionary.admin.layout.role}: {dictionary.admin.roles[user.role]}
+            </p>
           </div>
           <nav className="space-y-2 text-sm">
             {navItems.map((item) => (
