@@ -34,5 +34,213 @@
       }
     ],
     "categoriesTitle": "اختر رحلتك"
+  },
+  "booking": {
+    "title": "حجز جلساتك",
+    "description": "اختر دورتك، المستوى المناسب، ثم حدد الموضوعات التي تحتاجها لتحصل على عرض سعر دقيق مع تنبيه بالخصومات القريبة.",
+    "summaryButton": "عرض ملخص الحجز",
+    "emptyCourses": {
+      "title": "لا توجد دورات متاحة",
+      "description": "يرجى التواصل مع الإدارة لإضافة الدورات."
+    },
+    "placementOptions": {
+      "KNOWN_LEVEL": "أنا أعرف مستواي",
+      "PLACEMENT_TEST": "أحتاج اختبار تحديد مستوى",
+      "DISCOVERY_CALL": "أريد جلسة تعريفية"
+    },
+    "form": {
+      "course": {
+        "title": "اختر الدورة",
+        "description": "اختر الدورة التي تناسب أهدافك التعليمية."
+      },
+      "difficulty": {
+        "title": "المستوى",
+        "description": "اختر مستوى الصعوبة لترى سعر الجلسة."
+      },
+      "topics": {
+        "title": "الموضوعات",
+        "description": "حدد الموضوعات التي تريد تغطيتها ليتم حساب عدد الجلسات.",
+        "empty": "لا توجد موضوعات لهذا المستوى بعد.",
+        "chipTemplate": "{{name}} · {{sessions}} جلسة"
+      },
+      "details": {
+        "title": "تفاصيل إضافية",
+        "description": "اختر طريقة تحديد المستوى وأدخل الوقت المناسب.",
+        "placementQuestion": "كيف نحدد مستواك؟",
+        "levelLabel": "مستواي الحالي",
+        "levelPlaceholder": "مثال: B1 متوسط",
+        "slotLabel": "موعد مفضل (توقيتك المحلي)",
+        "notesLabel": "ملاحظات",
+        "notesPlaceholder": "معلومات إضافية حول أهدافك أو تفضيلاتك."
+      },
+      "summary": {
+        "title": "ملخص الحجز",
+        "description": "راجع التفاصيل قبل التأكيد.",
+        "sessionsLabel": "عدد الجلسات",
+        "subtotalLabel": "السعر الإجمالي",
+        "discountLabel": "الخصم",
+        "finalLabel": "المبلغ النهائي",
+        "couponLabel": "كوبون خصم",
+        "couponPlaceholder": "أدخل الكوبون",
+        "couponCheck": "تحقق",
+        "upsellTemplate": "أضف {{sessions}} جلسات إضافية لتحصل على خصم {{percent}}% وتوفر {{savings}}"
+      },
+      "actions": {
+        "confirm": "تأكيد الحجز",
+        "confirming": "جاري التأكيد..."
+      }
+    },
+    "toast": {
+      "success": "تم حجز جلساتك بنجاح",
+      "reference": "رقم الحجز {{id}}"
+    },
+    "errors": {
+      "pricingFailed": "فشل احتساب السعر",
+      "bookingFailed": "فشل إنشاء الحجز"
+    }
+  },
+  "admin": {
+    "nav": {
+      "overview": "نظرة عامة",
+      "appointments": "المواعيد",
+      "calendar": "التقويم",
+      "catalog": "إدارة المحتوى",
+      "reports": "التقارير",
+      "cashBooking": "حجوزات نقدية",
+      "users": "المتعلمون"
+    },
+    "roles": {
+      "ADMIN": "مشرف",
+      "LEARNER": "متعلم"
+    },
+    "layout": {
+      "greeting": "مرحباً",
+      "role": "الدور"
+    },
+    "overview": {
+      "title": "لوحة التحكم",
+      "description": "نظرة سريعة على الأداء والأنشطة الحالية.",
+      "stats": {
+        "courses": {
+          "title": "عدد الدورات",
+          "description": "الدورات النشطة في المنصة"
+        },
+        "bookings": {
+          "title": "الحجوزات",
+          "description": "إجمالي الحجوزات المؤكدة"
+        },
+        "learners": {
+          "title": "المتعلمون",
+          "description": "عدد المتعلمين المسجلين"
+        },
+        "revenue": {
+          "title": "إيراد نقدي",
+          "description": "الإيرادات المؤكدة عبر المدفوعات النقدية"
+        }
+      },
+      "quickActionsTitle": "مهام سريعة",
+      "quickActionsDescription": "ابدأ بإضافة دورة جديدة أو مراجعة الحجوزات المعلقة.",
+      "quickActions": {
+        "cashBooking": "إنشاء حجز نقدي",
+        "manageAppointments": "إدارة المواعيد"
+      }
+    },
+    "catalog": {
+      "title": "إدارة المحتوى التعليمي",
+      "description": "تحكم بالدورات، المستويات، والموضوعات من مكان واحد.",
+      "createCourse": {
+        "title": "إضافة دورة جديدة",
+        "nameLabel": "اسم الدورة",
+        "descriptionLabel": "وصف الدورة",
+        "categoryLabel": "التصنيف",
+        "typeLabel": "نوع الدورة",
+        "typeOptions": {
+          "PRIVATE": "خاصة",
+          "CLASSROOM": "صفية"
+        },
+        "submit": "حفظ الدورة"
+      },
+      "updateCourse": {
+        "editAction": "تعديل",
+        "saveAction": "حفظ",
+        "cancelAction": "إلغاء"
+      },
+      "courseMeta": {
+        "type": "نوع الدورة",
+        "category": "التصنيف"
+      },
+      "difficulty": {
+        "title": "المستويات",
+        "existingTitle": "المستويات النشطة مع سعر الجلسة.",
+        "priceLabel": "سعر الجلسة (دولار)",
+        "addTitle": "إضافة مستوى جديد",
+        "labelPlaceholder": "اختر المستوى",
+        "pricePlaceholder": "مثال: 25",
+        "submit": "إضافة المستوى",
+        "labels": {
+          "BEGINNER": "مبتدئ",
+          "INTERMEDIATE": "متوسط",
+          "ADVANCED": "متقدم"
+        }
+      },
+      "topics": {
+        "title": "الموضوعات",
+        "empty": "لم تتم إضافة موضوعات بعد.",
+        "addButton": "إضافة موضوع",
+        "formTitle": "موضوع جديد",
+        "nameLabel": "اسم الموضوع",
+        "descriptionLabel": "الوصف",
+        "sessionsLabel": "عدد الجلسات",
+        "hoursLabel": "الساعات المقدرة",
+        "orderLabel": "الترتيب",
+        "submit": "حفظ",
+        "cancel": "إلغاء",
+        "editAction": "تعديل",
+        "moveUp": "للأعلى",
+        "moveDown": "للأسفل"
+      },
+      "feedback": {
+        "courseCreated": "تم إنشاء الدورة",
+        "courseUpdated": "تم تحديث الدورة",
+        "difficultyCreated": "تم إضافة المستوى",
+        "difficultyUpdated": "تم تحديث سعر المستوى",
+        "topicCreated": "تم إنشاء الموضوع",
+        "topicUpdated": "تم تحديث الموضوع",
+        "reorderSuccess": "تم تحديث ترتيب الموضوعات",
+        "errorGeneric": "حدث خطأ، يرجى المحاولة مجدداً"
+      },
+      "table": {
+        "perSession": "سعر الجلسة"
+      }
+    },
+    "calendar": {
+      "title": "التقويم",
+      "description": "تابع الجلسات المجدولة بنمط أسبوعي أو شهري.",
+      "weekView": "أسبوع",
+      "monthView": "شهر",
+      "previous": "السابق",
+      "next": "التالي",
+      "weekOf": "أسبوع",
+      "monthOf": "شهر",
+      "noSessions": "لا توجد جلسات",
+      "sessionAt": "الوقت"
+    },
+    "reports": {
+      "title": "التقارير",
+      "description": "راقب الأداء المالي وتشغيل الجلسات.",
+      "revenueCard": "إيراد نقدي",
+      "revenueDescription": "إجمالي المدفوعات النقدية المؤكدة.",
+      "bookedCard": "جلسات محجوزة",
+      "bookedDescription": "الجلسات المجدولة أو المعاد جدولتها.",
+      "doneCard": "جلسات منجزة",
+      "doneDescription": "الجلسات المكتملة بنجاح.",
+      "canceledCard": "جلسات ملغاة/غياب",
+      "canceledDescription": "المواعيد التي لم تكتمل.",
+      "discountsCard": "خصومات مستخدمة",
+      "discountsDescription": "القيمة الإجمالية للخصومات المطبقة.",
+      "utilizationCard": "نسبة الاستفادة",
+      "utilizationDescription": "مدى استثمار الساعات المحجوزة.",
+      "utilizationDetail": "أُنجز {{completed}} من أصل {{scheduled}} ساعات ({{percentage}}%)."
+    }
   }
 }

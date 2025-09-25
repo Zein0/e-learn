@@ -1,25 +1,24 @@
 import { prisma } from "@/lib/db";
 import { getDictionary, getLocale } from "@/lib/i18n";
-import { BookingForm } from "@/components/booking/booking-form";
-import type { BookingCourse } from "@/lib/types/booking";
+import type { AdminCatalogCourse } from "@/lib/types/admin";
+import { CatalogManager } from "@/components/admin/catalog/catalog-manager";
 
 export const dynamic = "force-dynamic";
 
-export default async function BookingPage() {
+export default async function AdminCatalogPage() {
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
-  let courses: BookingCourse[] = [];
+  let courses: AdminCatalogCourse[] = [];
   try {
     const records = await prisma.course.findMany({
       include: {
         difficulties: true,
-        topics: {
-          orderBy: { order: "asc" },
-        },
+        topics: true,
       },
       orderBy: { title: "asc" },
     });
+
     courses = records.map((course) => ({
       id: course.id,
       title: course.title,
@@ -34,22 +33,24 @@ export default async function BookingPage() {
       topics: course.topics.map((topic) => ({
         id: topic.id,
         name: topic.name,
+        description: topic.description,
         sessionsRequired: topic.sessionsRequired,
         estimatedHours: topic.estimatedHours,
+        order: topic.order,
         difficultyId: topic.difficultyId,
       })),
     }));
   } catch (error) {
-    console.error("Failed to load booking courses", error);
+    console.error("Failed to load catalog", error);
   }
 
   return (
     <section className="space-y-8">
-      <div className="rounded-[36px] bg-white/80 p-8 shadow-soft ring-1 ring-brand-100">
-        <h1 className="font-display text-3xl text-brand-800">{dictionary.booking.title}</h1>
-        <p className="mt-2 text-brand-600">{dictionary.booking.description}</p>
+      <div className="rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
+        <h1 className="font-display text-3xl text-brand-800">{dictionary.admin.catalog.title}</h1>
+        <p className="text-brand-600">{dictionary.admin.catalog.description}</p>
       </div>
-      <BookingForm courses={courses} locale={locale} dictionary={dictionary.booking} />
+      <CatalogManager initialCourses={courses} dictionary={dictionary.admin.catalog} locale={locale} />
     </section>
   );
 }
