@@ -57,6 +57,7 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
     courseId,
     difficultyId,
     selectedTopicIds,
+    knowsLevel,
     placementChoice,
     levelProvided,
     slotStartAt,
@@ -80,8 +81,16 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
   );
 
   const selectedCourse = useMemo(() => courses.find((course) => course.id === courseId) ?? courses[0], [courses, courseId]);
-  const difficulties = selectedCourse?.difficulties ?? [];
-  const selectedDifficulty = difficulties.find((diff) => diff.id === difficultyId) ?? difficulties[0];
+  const difficulties = useMemo(() => selectedCourse?.difficulties ?? [], [selectedCourse]);
+  const selectedDifficulty = useMemo(() => {
+    if (!difficulties.length) return undefined;
+    const matched = difficulties.find((diff) => diff.id === difficultyId);
+    if (matched) return matched;
+    if (knowsLevel) {
+      return difficulties[0];
+    }
+    return undefined;
+  }, [difficulties, difficultyId, knowsLevel]);
 
   useEffect(() => {
     if (!courseId && selectedCourse) {
@@ -90,13 +99,36 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
   }, [courseId, selectedCourse, setField]);
 
   useEffect(() => {
-    if (!difficultyId && selectedDifficulty) {
+    if (knowsLevel && !difficultyId && selectedDifficulty) {
       setField("difficultyId", selectedDifficulty.id);
     }
-  }, [difficultyId, selectedDifficulty, setField]);
+  }, [difficultyId, knowsLevel, selectedDifficulty, setField]);
+
+  useEffect(() => {
+    if (knowsLevel === false) {
+      if (difficultyId) {
+        setField("difficultyId", undefined);
+      }
+      if (selectedTopicIds.length) {
+        setField("selectedTopicIds", []);
+      }
+    }
+  }, [difficultyId, knowsLevel, selectedTopicIds, setField]);
+
+  useEffect(() => {
+    if (knowsLevel === true && placementChoice !== "KNOWN_LEVEL") {
+      setField("placementChoice", "KNOWN_LEVEL");
+    }
+    if (knowsLevel === false && placementChoice === "KNOWN_LEVEL") {
+      setField("placementChoice", "PLACEMENT_TEST");
+    }
+  }, [knowsLevel, placementChoice, setField]);
 
   const topics = useMemo(
-    () => selectedCourse?.topics.filter((topic) => topic.difficultyId === selectedDifficulty?.id) ?? [],
+    () =>
+      selectedDifficulty
+        ? selectedCourse?.topics.filter((topic) => topic.difficultyId === selectedDifficulty.id) ?? []
+        : [],
     [selectedCourse, selectedDifficulty],
   );
 
@@ -116,9 +148,12 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
         difficultyId: selectedDifficulty?.id,
         topicIds: selectedTopicIds,
         couponCode,
+        knowsLevel,
       },
     ],
-    enabled: Boolean(selectedCourse?.id && selectedDifficulty?.id && selectedTopicIds.length > 0),
+    enabled: Boolean(
+      knowsLevel && selectedCourse?.id && selectedDifficulty?.id && selectedTopicIds.length > 0,
+    ),
     queryFn: async () => {
       const response = await fetch("/api/pricing", {
         method: "POST",
@@ -190,7 +225,8 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
   });
 
   const canSubmit = Boolean(
-    selectedCourse?.id &&
+    knowsLevel &&
+      selectedCourse?.id &&
       selectedDifficulty?.id &&
       selectedTopicIds.length > 0 &&
       slotStartAt &&
@@ -301,46 +337,88 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>{dictionary.form.difficulty.title}</CardTitle>
-              <CardDescription>{dictionary.form.difficulty.description}</CardDescription>
+              <CardTitle>{dictionary.form.levelCheck.title}</CardTitle>
+              <CardDescription>{dictionary.form.levelCheck.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {difficulties.map((difficulty) => (
-                <Button
-                  key={difficulty.id}
-                  type="button"
-                  variant={difficulty.id === selectedDifficulty?.id ? "default" : "outline"}
-                  onClick={() => setField("difficultyId", difficulty.id)}
-                >
-                  {difficulty.label}
-                </Button>
-              ))}
+            <CardContent className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                variant={knowsLevel === true ? "default" : "outline"}
+                onClick={() => setField("knowsLevel", true)}
+                className="flex-1 rounded-3xl py-3 text-sm font-semibold sm:flex-none"
+              >
+                {dictionary.form.levelCheck.knows}
+              </Button>
+              <Button
+                type="button"
+                variant={knowsLevel === false ? "default" : "outline"}
+                onClick={() => setField("knowsLevel", false)}
+                className="flex-1 rounded-3xl py-3 text-sm font-semibold sm:flex-none"
+              >
+                {dictionary.form.levelCheck.unsure}
+              </Button>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{dictionary.form.topics.title}</CardTitle>
-              <CardDescription>{dictionary.form.topics.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {topics.length === 0 && <p className="text-sm text-brand-500">{dictionary.form.topics.empty}</p>}
-              <div className="flex flex-wrap gap-2">
-                {topics.map((topic) => (
-                  <Badge
-                    key={topic.id}
-                    selected={selectedTopicIds.includes(topic.id)}
-                    onClick={() => toggleTopic(topic.id)}
-                  >
-                    {renderTemplate(dictionary.form.topics.chipTemplate, {
-                      name: topic.name,
-                      sessions: topic.sessionsRequired,
-                    })}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {knowsLevel && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{dictionary.form.difficulty.title}</CardTitle>
+                <CardDescription>{dictionary.form.difficulty.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3 sm:grid-cols-3">
+                {difficulties.map((difficulty) => {
+                  const isSelected = difficulty.id === selectedDifficulty?.id;
+                  return (
+                    <Button
+                      key={difficulty.id}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      onClick={() => setField("difficultyId", difficulty.id)}
+                      className="h-auto rounded-3xl px-5 py-4 text-left"
+                    >
+                      <span className="block text-sm font-semibold uppercase tracking-wide">
+                        {difficulty.label}
+                      </span>
+                      <span
+                        className={`mt-1 block text-xs ${
+                          isSelected ? "text-white/80" : "text-emerald-600"
+                        }`}
+                      >
+                        {`${formatCurrency(locale, difficulty.pricePerSession)} · ${dictionary.form.difficulty.priceLabel}`}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+
+          {selectedDifficulty && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{dictionary.form.topics.title}</CardTitle>
+                <CardDescription>{dictionary.form.topics.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {topics.length === 0 && <p className="text-sm text-brand-500">{dictionary.form.topics.empty}</p>}
+                <div className="flex flex-wrap gap-2">
+                  {topics.map((topic) => (
+                    <Badge
+                      key={topic.id}
+                      selected={selectedTopicIds.includes(topic.id)}
+                      onClick={() => toggleTopic(topic.id)}
+                    >
+                      {renderTemplate(dictionary.form.topics.chipTemplate, {
+                        name: topic.name,
+                        sessions: topic.sessionsRequired,
+                      })}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -351,19 +429,21 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
               <div className="grid gap-2">
                 <Label>{dictionary.form.details.placementQuestion}</Label>
                 <div className="grid gap-2 sm:grid-cols-3">
-                  {placementOptions.map((option) => (
-                    <Button
-                      key={option.value}
-                      type="button"
-                      variant={placementChoice === option.value ? "default" : "outline"}
-                      onClick={() => setField("placementChoice", option.value)}
-                    >
-                      {option.label}
-                    </Button>
-                  ))}
+                  {placementOptions
+                    .filter((option) => knowsLevel || option.value !== "KNOWN_LEVEL")
+                    .map((option) => (
+                      <Button
+                        key={option.value}
+                        type="button"
+                        variant={placementChoice === option.value ? "default" : "outline"}
+                        onClick={() => setField("placementChoice", option.value)}
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
                 </div>
               </div>
-              {placementChoice === "KNOWN_LEVEL" && (
+              {placementChoice === "KNOWN_LEVEL" && knowsLevel && (
                 <div className="grid gap-2">
                   <Label htmlFor="level">{dictionary.form.details.levelLabel}</Label>
                   <Input

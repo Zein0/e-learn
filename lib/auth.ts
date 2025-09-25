@@ -1,4 +1,5 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getFirebaseAdmin } from "./firebase-admin";
 import { prisma } from "./db";
 
@@ -43,6 +44,17 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       code === "auth/session-cookie-revoked"
     ) {
       cookieStore.delete("session");
+    }
+    const requestHeaders = headers();
+    const currentPath = requestHeaders.get("next-url") ?? "";
+    if (!currentPath.startsWith("/api")) {
+      if (currentPath.startsWith("/admin")) {
+        if (!currentPath.startsWith("/admin/login")) {
+          redirect("/admin/login");
+        }
+      } else if (!currentPath.startsWith("/login")) {
+        redirect("/login");
+      }
     }
     return null;
   }

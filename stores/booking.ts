@@ -6,6 +6,7 @@ type BookingState = {
   courseId?: string;
   difficultyId?: string;
   selectedTopicIds: string[];
+  knowsLevel?: boolean;
   placementChoice: PlacementChoice;
   levelProvided?: string;
   slotStartAt?: string;
@@ -26,7 +27,8 @@ type BookingActions = {
 
 const initialState: BookingState = {
   selectedTopicIds: [],
-  placementChoice: "KNOWN_LEVEL",
+  knowsLevel: undefined,
+  placementChoice: "PLACEMENT_TEST",
 };
 
 export const useBookingStore = create<BookingState & BookingActions>((set, get) => ({

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState, useTransition } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirebaseClient } from "@/lib/firebase-client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,12 @@ type LoginFormDictionary = {
   passwordPlaceholder: string;
   submit: string;
   submitting: string;
+  signup: string;
+  signingUp: string;
+  toggleToSignup: string;
+  toggleToLogin: string;
   success: string;
+  signupSuccess: string;
   errors: {
     userSyncFailed: string;
     unexpected: string;
@@ -30,13 +35,17 @@ export function LoginForm({ dictionary }: LoginFormProps) {
   const auth = getFirebaseClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     startTransition(async () => {
       try {
-        const credential = await signInWithEmailAndPassword(auth, email, password);
+        const credential =
+          mode === "signup"
+            ? await createUserWithEmailAndPassword(auth, email, password)
+            : await signInWithEmailAndPassword(auth, email, password);
         const idToken = await credential.user.getIdToken(true);
         const response = await fetch("/api/users", {
           method: "POST",
@@ -46,7 +55,7 @@ export function LoginForm({ dictionary }: LoginFormProps) {
         if (!response.ok) {
           throw new Error(dictionary.errors.userSyncFailed);
         }
-        toast.success(dictionary.success);
+        toast.success(mode === "signup" ? dictionary.signupSuccess : dictionary.success);
         setEmail("");
         setPassword("");
       } catch (error) {
@@ -57,7 +66,7 @@ export function LoginForm({ dictionary }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-2">
         <Label htmlFor="email">{dictionary.emailLabel}</Label>
         <Input
@@ -82,9 +91,24 @@ export function LoginForm({ dictionary }: LoginFormProps) {
           placeholder={dictionary.passwordPlaceholder}
         />
       </div>
-      <Button type="submit" className="w-full" size="lg" disabled={isPending}>
-        {isPending ? dictionary.submitting : dictionary.submit}
-      </Button>
+      <div className="space-y-3">
+        <Button type="submit" className="w-full" size="lg" disabled={isPending}>
+          {isPending
+            ? mode === "signup"
+              ? dictionary.signingUp
+              : dictionary.submitting
+            : mode === "signup"
+              ? dictionary.signup
+              : dictionary.submit}
+        </Button>
+        <button
+          type="button"
+          onClick={() => setMode((current) => (current === "login" ? "signup" : "login"))}
+          className="w-full text-sm font-medium text-emerald-600 transition hover:text-emerald-700"
+        >
+          {mode === "login" ? dictionary.toggleToSignup : dictionary.toggleToLogin}
+        </button>
+      </div>
     </form>
   );
 }

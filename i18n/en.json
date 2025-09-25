@@ -72,7 +72,8 @@
       "cta": "Open dashboard"
     },
     "difficulties": {
-      "title": "Difficulty levels"
+      "title": "Difficulty levels",
+      "priceLabel": "per session"
     },
     "topics": {
       "title": "Topics",
@@ -129,7 +130,12 @@
       "passwordPlaceholder": "••••••••",
       "submit": "Log in",
       "submitting": "Signing in...",
+      "signup": "Sign up",
+      "signingUp": "Creating account...",
+      "toggleToSignup": "Need an account? Sign up",
+      "toggleToLogin": "Already have an account? Log in",
       "success": "Signed in successfully",
+      "signupSuccess": "Account created successfully",
       "errors": {
         "userSyncFailed": "Failed to persist user details",
         "unexpected": "Something went wrong. Please try again."
@@ -150,13 +156,20 @@
       "DISCOVERY_CALL": "I want a discovery call"
     },
     "form": {
+      "levelCheck": {
+        "title": "Do you know your level?",
+        "description": "Let us know if you're confident about your current level before picking a difficulty.",
+        "knows": "Yes, I know my level",
+        "unsure": "I'm not sure yet"
+      },
       "course": {
         "title": "Choose a course",
         "description": "Select the course that matches your goals."
       },
       "difficulty": {
         "title": "Difficulty",
-        "description": "Pick a level to reveal the session rate."
+        "description": "Pick a level to reveal the session rate.",
+        "priceLabel": "per session"
       },
       "topics": {
         "title": "Topics",
