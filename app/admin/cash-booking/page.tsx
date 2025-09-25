@@ -36,13 +36,13 @@ export default async function AdminCashBookingPage() {
   return (
     <section className="space-y-6">
       <div className="rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
-        <h1 className="font-display text-3xl text-brand-800">حجز نقدي</h1>
-        <p className="text-brand-600">أنشئ حجزاً للمتعلمين الذين يدفعون نقداً وأصدر إيصالاً فورياً.</p>
+        <h1 className="font-display text-3xl text-brand-800">Cash booking</h1>
+        <p className="text-brand-600">Create bookings for learners paying in cash and issue receipts instantly.</p>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>تفاصيل الحجز</CardTitle>
-          <CardDescription>املأ بيانات المتعلم، اختر الدورة، وأدخل معلومات الإيصال.</CardDescription>
+          <CardTitle>Booking details</CardTitle>
+          <CardDescription>Fill in learner information, pick a course, and record the receipt details.</CardDescription>
         </CardHeader>
         <CardContent>
           <CashBookingForm courses={courses} />

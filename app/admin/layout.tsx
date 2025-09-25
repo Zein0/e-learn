@@ -2,15 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") {
-    redirect("/login");
+    redirect("/admin/login");
   }
 
-  const locale = await getLocale();
+  const locale: Locale = "en";
   const dictionary = await getDictionary(locale);
   const navItems = [
     { href: "/admin", label: dictionary.admin.nav.overview },

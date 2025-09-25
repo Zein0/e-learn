@@ -1,13 +1,14 @@
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { AdminDictionary } from "@/lib/types/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverviewPage() {
-  const locale = await getLocale();
+  const locale: Locale = "en";
   const dictionary = await getDictionary(locale);
 
   let stats = {

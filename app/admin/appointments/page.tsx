@@ -33,8 +33,8 @@ export default async function AdminAppointmentsPage() {
   return (
     <section className="space-y-6">
       <div className="rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
-        <h1 className="font-display text-3xl text-brand-800">إدارة المواعيد</h1>
-        <p className="text-brand-600">قم بتحديث حالة الجلسات، إضافة ملاحظات، أو إعادة الجدولة.</p>
+        <h1 className="font-display text-3xl text-brand-800">Manage appointments</h1>
+        <p className="text-brand-600">Update session status, leave notes for instructors, or reschedule bookings.</p>
       </div>
       <AppointmentsTable appointments={appointments} />
     </section>

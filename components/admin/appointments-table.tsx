@@ -19,11 +19,11 @@ export type AdminAppointment = {
 };
 
 const statusLabels: Record<string, string> = {
-  SCHEDULED: "مجدول",
-  DONE: "منجز",
-  CANCELED: "ملغى",
-  RESCHEDULED: "معاد جدولته",
-  NO_SHOW: "لم يحضر",
+  SCHEDULED: "Scheduled",
+  DONE: "Completed",
+  CANCELED: "Canceled",
+  RESCHEDULED: "Rescheduled",
+  NO_SHOW: "No show",
 };
 
 type Action = "CANCEL" | "CONFIRM_DONE" | "ADD_NOTES" | "RESCHEDULE";
@@ -42,22 +42,25 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
       });
       if (!response.ok) {
         const message = (await response.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(message?.error ?? "فشل تحديث الموعد");
+        throw new Error(message?.error ?? "Failed to update appointment");
       }
       return response.json();
     },
     onSuccess: () => {
-      toast.success("تم تحديث الموعد");
+      toast.success("Appointment updated");
       window.location.reload();
     },
     onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : "حدث خطأ غير متوقع");
+      toast.error(error instanceof Error ? error.message : "Unexpected error");
     },
   });
 
   const handleAction = (id: string, action: Action) => {
     if (action === "RESCHEDULE") {
-      const newStartAt = window.prompt("اختر تاريخاً جديداً بصيغة YYYY-MM-DDTHH:mm", new Date().toISOString().slice(0, 16));
+      const newStartAt = window.prompt(
+        "Select a new start date in YYYY-MM-DDTHH:mm format",
+        new Date().toISOString().slice(0, 16),
+      );
       if (!newStartAt) return;
       mutation.mutate({ id, action, newStartAt });
       return;
@@ -67,16 +70,16 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
 
   return (
     <div className="overflow-x-auto rounded-3xl bg-white/80 shadow-soft ring-1 ring-brand-100">
-      <table className="w-full min-w-[720px] text-right text-sm">
+      <table className="w-full min-w-[720px] text-left text-sm">
         <thead className="bg-brand-100/60 text-brand-600">
           <tr>
-            <th className="px-4 py-3 font-medium">المتعلم</th>
-            <th className="px-4 py-3 font-medium">الدورة</th>
-            <th className="px-4 py-3 font-medium">الموضوع</th>
-            <th className="px-4 py-3 font-medium">الوقت</th>
-            <th className="px-4 py-3 font-medium">الحالة</th>
-            <th className="px-4 py-3 font-medium">ملاحظات</th>
-            <th className="px-4 py-3 font-medium">إجراءات</th>
+            <th className="px-4 py-3 font-medium">Learner</th>
+            <th className="px-4 py-3 font-medium">Course</th>
+            <th className="px-4 py-3 font-medium">Topic</th>
+            <th className="px-4 py-3 font-medium">Schedule</th>
+            <th className="px-4 py-3 font-medium">Status</th>
+            <th className="px-4 py-3 font-medium">Notes</th>
+            <th className="px-4 py-3 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -88,7 +91,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
               <td className="px-4 py-3 text-brand-500">
                 <div className="flex flex-col">
                   <span>{formatUTC(appointment.startAt)}</span>
-                  <span className="text-xs text-brand-400">حتى {formatUTC(appointment.endAt, { variant: "time" })}</span>
+                  <span className="text-xs text-brand-400">until {formatUTC(appointment.endAt, { variant: "time" })}</span>
                 </div>
               </td>
               <td className="px-4 py-3">
@@ -100,7 +103,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
                 <Textarea
                   value={notesState[appointment.id] ?? ""}
                   onChange={(event) => setNotesState((state) => ({ ...state, [appointment.id]: event.target.value }))}
-                  placeholder="أضف ملاحظات للمدرب"
+                  placeholder="Add notes for the instructor"
                 />
                 <Button
                   type="button"
@@ -110,7 +113,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
                   onClick={() => handleAction(appointment.id, "ADD_NOTES")}
                   disabled={mutation.isPending}
                 >
-                  حفظ الملاحظات
+                  Save notes
                 </Button>
               </td>
               <td className="px-4 py-3">
@@ -122,7 +125,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
                     onClick={() => handleAction(appointment.id, "RESCHEDULE")}
                     disabled={mutation.isPending}
                   >
-                    إعادة جدولة
+                    Reschedule
                   </Button>
                   <Button
                     type="button"
@@ -131,7 +134,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
                     onClick={() => handleAction(appointment.id, "CONFIRM_DONE")}
                     disabled={mutation.isPending}
                   >
-                    إنهاء الجلسة
+                    Mark as done
                   </Button>
                   <Button
                     type="button"
@@ -141,7 +144,7 @@ export function AppointmentsTable({ appointments }: { appointments: AdminAppoint
                     onClick={() => handleAction(appointment.id, "CANCEL")}
                     disabled={mutation.isPending}
                   >
-                    إلغاء
+                    Cancel
                   </Button>
                 </div>
               </td>

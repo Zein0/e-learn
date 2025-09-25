@@ -90,16 +90,16 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
       });
       if (!response.ok) {
         const message = (await response.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(message?.error ?? "فشل إنشاء الحجز النقدي");
+        throw new Error(message?.error ?? "Failed to create cash booking");
       }
       return response.json();
     },
     onSuccess: () => {
-      toast.success("تم إنشاء الحجز النقدي");
+      toast.success("Cash booking created");
       setForm({ ...initialState, courseId: courses[0]?.id, difficultyId: courses[0]?.difficulties[0]?.id });
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "حدث خطأ غير متوقع");
+      toast.error(error instanceof Error ? error.message : "Unexpected error");
     },
   });
 
@@ -120,8 +120,8 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>لا توجد دورات متاحة للحجز</CardTitle>
-          <CardDescription>أضف الدورات من لوحة التحكم قبل إنشاء حجوزات نقدية.</CardDescription>
+          <CardTitle>No courses available</CardTitle>
+          <CardDescription>Add courses from the dashboard before creating cash bookings.</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -137,7 +137,7 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
     >
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
-          <Label htmlFor="userEmail">البريد الإلكتروني</Label>
+          <Label htmlFor="userEmail">Learner email</Label>
           <Input
             id="userEmail"
             type="email"
@@ -148,26 +148,26 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="userName">الاسم الكامل</Label>
+          <Label htmlFor="userName">Full name</Label>
           <Input
             id="userName"
             required
             value={form.userName}
             onChange={(event) => updateField("userName", event.target.value)}
-            placeholder="اسم المتعلم"
+            placeholder="Learner name"
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="userPhone">رقم الهاتف</Label>
+          <Label htmlFor="userPhone">Phone number</Label>
           <Input
             id="userPhone"
             value={form.userPhone}
             onChange={(event) => updateField("userPhone", event.target.value)}
-            placeholder="مثال: +961123456"
+            placeholder="e.g. +961123456"
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="slot">موعد الجلسة الأولى</Label>
+          <Label htmlFor="slot">First session time</Label>
           <Input
             id="slot"
             type="datetime-local"
@@ -180,7 +180,7 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
 
       <div className="grid gap-4">
         <div className="grid gap-2">
-          <Label>الدورة</Label>
+          <Label>Course</Label>
           <div className="flex flex-wrap gap-2">
             {courses.map((course) => (
               <Button
@@ -195,7 +195,7 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
           </div>
         </div>
         <div className="grid gap-2">
-          <Label>المستوى</Label>
+          <Label>Difficulty</Label>
           <div className="flex flex-wrap gap-2">
             {selectedCourse?.difficulties.map((difficulty) => (
               <Button
@@ -210,25 +210,24 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
           </div>
         </div>
         <div className="grid gap-2">
-          <Label>الموضوعات المختارة</Label>
+          <Label>Topics</Label>
           <div className="flex flex-wrap gap-2">
             {topics.map((topic) => (
               <Badge key={topic.id} selected={form.selectedTopics.includes(topic.id)} onClick={() => toggleTopic(topic.id)}>
-                {topic.name} · {topic.sessionsRequired} جلسة
+                {topic.name} · {topic.sessionsRequired} sessions
               </Badge>
             ))}
           </div>
           <p className="text-sm text-brand-500">
-            إجمالي الجلسات: {sessionsTotal} — القيمة المقترحة:
-            {" "}
-            {estimatedAmount.toLocaleString("ar-LB", { style: "currency", currency: form.currency })}
+            Total sessions: {sessionsTotal} — Suggested amount:{" "}
+            {estimatedAmount.toLocaleString("en-US", { style: "currency", currency: form.currency })}
           </p>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="grid gap-2">
-          <Label htmlFor="amount">المبلغ المحصل</Label>
+          <Label htmlFor="amount">Amount collected</Label>
           <Input
             id="amount"
             type="number"
@@ -238,7 +237,7 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="currency">العملة</Label>
+          <Label htmlFor="currency">Currency</Label>
           <Input
             id="currency"
             value={form.currency}
@@ -246,28 +245,28 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="coupon">كوبون (اختياري)</Label>
+          <Label htmlFor="coupon">Coupon (optional)</Label>
           <Input
             id="coupon"
             value={form.couponCode ?? ""}
             onChange={(event) => updateField("couponCode", event.target.value)}
-            placeholder="CODE10"
+            placeholder="SAVE10"
           />
         </div>
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="notes">ملاحظات</Label>
+        <Label htmlFor="notes">Notes</Label>
         <Textarea
           id="notes"
           value={form.notes}
           onChange={(event) => updateField("notes", event.target.value)}
-          placeholder="ملاحظات إضافية للمدرب أو المتعلم"
+          placeholder="Additional notes for the instructor or learner"
         />
       </div>
 
       <Button type="submit" size="lg" className="w-full md:w-auto" disabled={mutation.isPending}>
-        {mutation.isPending ? "جاري الإنشاء..." : "إنشاء الحجز"}
+        {mutation.isPending ? "Creating..." : "Create booking"}
       </Button>
     </form>
   );
