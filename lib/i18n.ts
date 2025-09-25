@@ -1,12 +1,12 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
-export const SUPPORTED_LOCALES = ["ar", "en"] as const;
-export type Locale = (typeof SUPPORTED_LOCALES)[number];
-
-const FALLBACK_LOCALE: Locale = "en";
-const DEFAULT_LOCALE: Locale = "ar";
-
-export const isRTL = (locale: Locale) => locale === "ar";
+import {
+  DEFAULT_LOCALE,
+  FALLBACK_LOCALE,
+  LOCALE_COOKIE,
+  SUPPORTED_LOCALES,
+  type Locale,
+} from "./i18n-config";
 
 async function importDictionary(locale: Locale) {
   switch (locale) {
@@ -20,14 +20,24 @@ async function importDictionary(locale: Locale) {
 }
 
 export async function getLocale(): Promise<Locale> {
-  const hdrs = headers();
-  const acceptLanguage = hdrs.get("x-next-intl-locale") ?? hdrs.get("accept-language");
-  if (!acceptLanguage) {
-    return DEFAULT_LOCALE;
+  const cookieStore = cookies();
+  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value as Locale | undefined;
+  if (cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale)) {
+    return cookieLocale;
   }
-  const preferred = acceptLanguage.split(",")[0]?.split("-")[0];
-  if (preferred && SUPPORTED_LOCALES.includes(preferred as Locale)) {
-    return preferred as Locale;
+
+  const hdrs = headers();
+  const hintedLocale = hdrs.get("x-next-locale") ?? hdrs.get("x-next-intl-locale");
+  if (hintedLocale && SUPPORTED_LOCALES.includes(hintedLocale as Locale)) {
+    return hintedLocale as Locale;
+  }
+
+  const acceptLanguage = hdrs.get("accept-language");
+  if (acceptLanguage) {
+    const preferred = acceptLanguage.split(",")[0]?.split("-")[0];
+    if (preferred && SUPPORTED_LOCALES.includes(preferred as Locale)) {
+      return preferred as Locale;
+    }
   }
   return DEFAULT_LOCALE;
 }
@@ -41,3 +51,6 @@ export async function getDictionary(locale?: Locale) {
     return await importDictionary(FALLBACK_LOCALE);
   }
 }
+
+export { SUPPORTED_LOCALES, isRTL } from "./i18n-config";
+export type { Locale } from "./i18n-config";

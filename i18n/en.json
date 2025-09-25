@@ -5,6 +5,12 @@
     "login": "Log in",
     "courses": "Courses",
     "contact": "Contact",
+    "booking": "Booking",
+    "discovery": "Discovery Call",
+    "dashboard": "Dashboard",
+    "language": "Language",
+    "languageArabic": "Arabic",
+    "languageEnglish": "English",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "loading": "Loading",
@@ -33,7 +39,30 @@
         "description": "Pick the times and topics that fit you with smart progress tracking."
       }
     ],
-    "categoriesTitle": "Choose your path"
+    "categoriesTitle": "Choose your path",
+    "categoriesDescription": "Our learning tracks are crafted to strengthen conversation, writing, and international exam skills.",
+    "discoveryCta": "Book a discovery call",
+    "featureBullets": [
+      "Live online sessions",
+      "Plans tailored to your goals",
+      "Weekly progress tracking"
+    ],
+    "heroAlt": "Illustration for learning English",
+    "platform": {
+      "title": "A complete platform for learners and admins",
+      "description": "Manage courses, sessions, and cash payments from one mobile-friendly dashboard.",
+      "highlights": [
+        "Smart bookings",
+        "Discount alerts",
+        "Coupon support",
+        "Financial reports"
+      ]
+    }
+  },
+  "footer": {
+    "rights": "© {{year}} — Learn English Platform. All rights reserved.",
+    "email": "hello@learnenglish.com",
+    "phone": "+961 00 000 000"
   },
   "booking": {
     "title": "Book your sessions",

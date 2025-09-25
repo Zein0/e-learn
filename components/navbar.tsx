@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDictionary, getLocale, isRTL } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitch } from "@/components/language-switch";
 
 export async function Navbar() {
   const locale = await getLocale();
@@ -21,17 +22,25 @@ export async function Navbar() {
             {dict.common.courses}
           </Link>
           <Link href="/booking" className="hover:text-emerald-600">
-            الحجز
+            {dict.common.booking}
           </Link>
           <Link href="/discovery" className="hover:text-emerald-600">
-            جلسة تعريفية
+            {dict.common.discovery}
           </Link>
           <Link href="/admin" className="hover:text-emerald-600">
-            لوحة التحكم
+            {dict.common.dashboard}
           </Link>
         </nav>
         <div className="flex items-center gap-3">
-          <ThemeToggle dir={dir} />
+          <LanguageSwitch
+            locale={locale}
+            labels={{
+              title: dict.common.language,
+              arabic: dict.common.languageArabic,
+              english: dict.common.languageEnglish,
+            }}
+          />
+          <ThemeToggle dir={dir} labels={{ light: dict.common.lightMode, dark: dict.common.darkMode }} />
           <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
             <Link href="/login">{dict.common.login}</Link>
           </Button>
