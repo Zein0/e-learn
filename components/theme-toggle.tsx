@@ -21,7 +21,7 @@ export function ThemeToggle({ dir = "rtl", labels }: ThemeToggleProps) {
       size="icon"
       className="rounded-full border border-transparent hover:border-emerald-500"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? labels?.light ?? "الوضع الفاتح" : labels?.dark ?? "الوضع الداكن"}
+      aria-label={isDark ? labels?.light ?? "Light mode" : labels?.dark ?? "Dark mode"}
     >
       {isDark ? (
         <Sun className="h-5 w-5" aria-hidden />

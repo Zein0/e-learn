@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function CoursesPage() {
   const locale = await getLocale();
   const dict = await getDictionary(locale);
+  const coursesDict = dict.coursesPage;
 
   type CourseWithRelations = Prisma.CourseGetPayload<{
     include: {
@@ -38,23 +39,19 @@ export default async function CoursesPage() {
     <section className="space-y-10">
       <div className="rounded-[36px] bg-white/80 p-8 shadow-soft ring-1 ring-brand-100">
         <h1 className="font-display text-3xl text-brand-800">{dict.common.courses}</h1>
-        <p className="mt-3 max-w-2xl text-brand-600">
-          تصفح باقات تعليم الإنجليزية حسب المستوى ونوع الدورة، وشاهد عدد الجلسات والسعر لكل مستوى بدقة.
-        </p>
+        <p className="mt-3 max-w-2xl text-brand-600">{coursesDict.description}</p>
       </div>
 
       <div className="container-grid">
         {courses.length === 0 && (
           <Card className="col-span-full text-center">
             <CardHeader>
-              <CardTitle>لم يتم إضافة دورات بعد</CardTitle>
-              <CardDescription>
-                قم بإنشاء دورة جديدة من لوحة التحكم أو قم بتشغيل Prisma migrations.
-              </CardDescription>
+              <CardTitle>{coursesDict.empty.title}</CardTitle>
+              <CardDescription>{coursesDict.empty.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href="/admin">فتح لوحة التحكم</Link>
+                <Link href="/admin">{coursesDict.empty.cta}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -73,7 +70,7 @@ export default async function CoursesPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-brand-700">المستويات</h3>
+                  <h3 className="text-sm font-semibold text-brand-700">{coursesDict.difficulties.title}</h3>
                   <div className="flex flex-wrap gap-2">
                     {course.difficulties.map((difficulty) => (
                       <Badge key={difficulty.id}>
@@ -86,13 +83,15 @@ export default async function CoursesPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-brand-700">الموضوعات</h3>
+                  <h3 className="text-sm font-semibold text-brand-700">{coursesDict.topics.title}</h3>
                   <div className="grid gap-2 text-sm text-brand-600">
                     {course.topics.map((topic) => (
                       <div key={topic.id} className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-2">
                         <span>{topic.name}</span>
                         <span className="text-xs text-brand-400">
-                          {topic.sessionsRequired} جلسة · {topic.estimatedHours} ساعة تقديرية
+                          {coursesDict.topics.metaTemplate
+                            .replace("{{sessions}}", topic.sessionsRequired.toString())
+                            .replace("{{hours}}", topic.estimatedHours.toString())}
                         </span>
                       </div>
                     ))}

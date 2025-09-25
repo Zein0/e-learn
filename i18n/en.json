@@ -64,6 +64,78 @@
     "email": "hello@learnenglish.com",
     "phone": "+961 00 000 000"
   },
+  "coursesPage": {
+    "description": "Browse curated English learning packages by level and format, and review session counts with transparent pricing.",
+    "empty": {
+      "title": "No courses available yet",
+      "description": "Create a new course from the dashboard or run the Prisma migrations.",
+      "cta": "Open dashboard"
+    },
+    "difficulties": {
+      "title": "Difficulty levels"
+    },
+    "topics": {
+      "title": "Topics",
+      "metaTemplate": "{{sessions}} sessions · {{hours}} estimated hours"
+    }
+  },
+  "discovery": {
+    "title": "Free discovery session",
+    "description": "Book a 20-minute call to assess your level and build the ideal plan. We'll review your goals, schedule, and explain how lessons work.",
+    "flow": {
+      "title": "What to expect",
+      "description": "Three quick steps to match you with the right track.",
+      "steps": [
+        {
+          "title": "Introduction",
+          "description": "Tell us about your previous experience and goals."
+        },
+        {
+          "title": "Quick assessment",
+          "description": "Answer a few light questions so we can gauge your current level."
+        },
+        {
+          "title": "Action plan",
+          "description": "Receive course, session, and scheduling recommendations."
+        }
+      ]
+    },
+    "form": {
+      "title": "Ready to begin?",
+      "description": "Pick a convenient time and we'll confirm within minutes.",
+      "fields": {
+        "name": {
+          "label": "Full name",
+          "placeholder": "e.g. Sarah Smith"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "you@example.com"
+        },
+        "time": {
+          "label": "Preferred time"
+        }
+      },
+      "submit": "Request call"
+    }
+  },
+  "login": {
+    "title": "Sign in",
+    "description": "Sign in with your email and password. Your account will be created automatically if it doesn't exist.",
+    "form": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Log in",
+      "submitting": "Signing in...",
+      "success": "Signed in successfully",
+      "errors": {
+        "userSyncFailed": "Failed to persist user details",
+        "unexpected": "Something went wrong. Please try again."
+      }
+    }
+  },
   "booking": {
     "title": "Book your sessions",
     "description": "Choose your course, difficulty, and topics to get an exact quote with smart discount guidance.",
