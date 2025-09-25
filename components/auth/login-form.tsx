@@ -8,7 +8,25 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export function LoginForm() {
+type LoginFormDictionary = {
+  emailLabel: string;
+  emailPlaceholder: string;
+  passwordLabel: string;
+  passwordPlaceholder: string;
+  submit: string;
+  submitting: string;
+  success: string;
+  errors: {
+    userSyncFailed: string;
+    unexpected: string;
+  };
+};
+
+type LoginFormProps = {
+  dictionary: LoginFormDictionary;
+};
+
+export function LoginForm({ dictionary }: LoginFormProps) {
   const auth = getFirebaseClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,20 +37,20 @@ export function LoginForm() {
     startTransition(async () => {
       try {
         const credential = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await credential.user.getIdToken();
+        const idToken = await credential.user.getIdToken(true);
         const response = await fetch("/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idToken }),
         });
         if (!response.ok) {
-          throw new Error("فشل حفظ بيانات المستخدم");
+          throw new Error(dictionary.errors.userSyncFailed);
         }
-        toast.success("تم تسجيل الدخول بنجاح");
+        toast.success(dictionary.success);
         setEmail("");
         setPassword("");
       } catch (error) {
-        const message = error instanceof Error ? error.message : "حدث خطأ غير متوقع";
+        const message = error instanceof Error ? error.message : dictionary.errors.unexpected;
         toast.error(message);
       }
     });
@@ -41,7 +59,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-2">
-        <Label htmlFor="email">البريد الإلكتروني</Label>
+        <Label htmlFor="email">{dictionary.emailLabel}</Label>
         <Input
           id="email"
           type="email"
@@ -49,11 +67,11 @@ export function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
+          placeholder={dictionary.emailPlaceholder}
         />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="password">كلمة المرور</Label>
+        <Label htmlFor="password">{dictionary.passwordLabel}</Label>
         <Input
           id="password"
           type="password"
@@ -61,11 +79,11 @@ export function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="••••••••"
+          placeholder={dictionary.passwordPlaceholder}
         />
       </div>
       <Button type="submit" className="w-full" size="lg" disabled={isPending}>
-        {isPending ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+        {isPending ? dictionary.submitting : dictionary.submit}
       </Button>
     </form>
   );

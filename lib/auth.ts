@@ -11,11 +11,12 @@ export type SessionUser = {
 };
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
-  const token = cookies().get("session")?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get("session")?.value;
   if (!token) return null;
   try {
     const auth = getFirebaseAdmin();
-    const decoded = await auth.verifyIdToken(token);
+    const decoded = await auth.verifySessionCookie(token, true);
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
     });
@@ -29,6 +30,20 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     };
   } catch (error) {
     console.error("Failed to resolve current user", error);
+    const code =
+      (typeof error === "object" && error && "code" in error
+        ? (error as { code?: string }).code
+        : undefined) ??
+      (typeof error === "object" && error && "errorInfo" in error
+        ? (error as { errorInfo?: { code?: string } }).errorInfo?.code
+        : undefined);
+    if (
+      code === "auth/id-token-expired" ||
+      code === "auth/session-cookie-expired" ||
+      code === "auth/session-cookie-revoked"
+    ) {
+      cookieStore.delete("session");
+    }
     return null;
   }
 }
