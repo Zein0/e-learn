@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useTransition } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "@/lib/i18n-config";
@@ -24,7 +24,6 @@ const LOCALE_LABEL: Record<Locale, keyof LanguageSwitchProps["labels"]> = {
 
 export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const persistedLanguage = usePreferencesStore((state) => state.language);
   const setLanguage = usePreferencesStore((state) => state.setLanguage);
@@ -55,12 +54,7 @@ export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
         body: JSON.stringify({ locale: nextLocale }),
       });
 
-      const targetPath = resolveTargetPath({ pathname, nextLocale });
-      if (targetPath && targetPath !== pathname) {
-        router.replace(targetPath);
-      } else {
-        router.refresh();
-      }
+      router.refresh();
     });
   };
 
@@ -90,23 +84,3 @@ export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
   );
 }
 
-function resolveTargetPath({
-  pathname,
-  nextLocale,
-}: {
-  pathname: string;
-  nextLocale: Locale;
-}) {
-  const segments = pathname.split("/").filter(Boolean);
-  const firstSegment = segments[0];
-
-  if (segments.length === 0) {
-    return nextLocale === DEFAULT_LOCALE ? "/" : `/${nextLocale}`;
-  }
-
-  if (segments.length === 1 && SUPPORTED_LOCALES.includes(firstSegment as Locale)) {
-    return nextLocale === DEFAULT_LOCALE ? "/" : `/${nextLocale}`;
-  }
-
-  return pathname;
-}
