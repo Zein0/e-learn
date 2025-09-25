@@ -1,0 +1,38 @@
+{
+  "common": {
+    "brandName": "Learn English",
+    "getStarted": "Get Started",
+    "login": "Log in",
+    "courses": "Courses",
+    "contact": "Contact",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "loading": "Loading",
+    "price": "Price",
+    "sessions": "Sessions",
+    "hours": "Hours",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "home": {
+    "headline": "Improve your English with confidence",
+    "subheadline": "Arabic-first experience with flexible learning that adapts to your schedule.",
+    "cta": "Start your journey",
+    "features": [
+      {
+        "title": "Interactive Courses",
+        "description": "Explore tracks for every level guided by expert instructors."
+      },
+      {
+        "title": "Expert Teachers",
+        "description": "Learn from certified coaches with global experience."
+      },
+      {
+        "title": "Flexible Learning",
+        "description": "Pick the times and topics that fit you with smart progress tracking."
+      }
+    ],
+    "categoriesTitle": "Choose your path"
+  }
+}

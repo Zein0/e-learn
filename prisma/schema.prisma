@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  LEARNER
+  ADMIN
+}
+
+enum CourseType {
+  PRIVATE
+  CLASSROOM
+}
+
+enum DifficultyLabel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CouponType {
+  PERCENT
+  FLAT
+}
+
+enum BookingStatus {
+  PENDING
+  AWAITING_PAYMENT
+  CONFIRMED
+  CANCELED
+}
+
+enum PlacementChoice {
+  KNOWN_LEVEL
+  PLACEMENT_TEST
+  DISCOVERY_CALL
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  DONE
+  CANCELED
+  RESCHEDULED
+  NO_SHOW
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique
+  email       String   @unique
+  name        String?
+  phone       String?
+  role        Role     @default(LEARNER)
+  bookings    Booking[]
+  appointments Appointment[]
+  cashReceipts AdminCashReceipt[] @relation("AdminReceipts")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id            String            @id @default(uuid())
+  title         String
+  description   String
+  type          CourseType
+  category      String
+  difficulties  CourseDifficulty[]
+  topics        Topic[]
+  discountRules DiscountRule[]
+  bookings      Booking[]
+  appointments  Appointment[] @relation("CourseAppointments")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CourseDifficulty {
+  id              String         @id @default(uuid())
+  course          Course         @relation(fields: [courseId], references: [id])
+  courseId        String
+  label           DifficultyLabel
+  pricePerSession Decimal @db.Decimal(10, 2)
+  topics          Topic[]
+  bookings        Booking[] @relation("BookingDifficulty")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@unique([courseId, label])
+}
+
+model Topic {
+  id               String    @id @default(uuid())
+  name             String
+  description      String?
+  sessionsRequired Int
+  estimatedHours   Int
+  order            Int
+  course           Course           @relation(fields: [courseId], references: [id])
+  courseId         String
+  difficulty       CourseDifficulty @relation(fields: [difficultyId], references: [id])
+  difficultyId     String
+  appointments     Appointment[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model DiscountRule {
+  id          String   @id @default(uuid())
+  course      Course?  @relation(fields: [courseId], references: [id])
+  courseId    String?
+  minSessions Int
+  percentOff  Decimal  @db.Decimal(5, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Coupon {
+  id             String   @id @default(uuid())
+  code           String   @unique
+  type           CouponType
+  value          Decimal  @db.Decimal(10, 2)
+  maxRedemptions Int?
+  redeemedCount  Int      @default(0)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  isActive       Boolean  @default(true)
+  bookings       Booking[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Booking {
+  id                   String            @id @default(uuid())
+  user                 User              @relation(fields: [userId], references: [id])
+  userId               String
+  course               Course            @relation(fields: [courseId], references: [id])
+  courseId             String
+  selectedDifficulty   CourseDifficulty  @relation("BookingDifficulty", fields: [selectedDifficultyId], references: [id])
+  selectedDifficultyId String
+  selectedTopicIds     String[]
+  placementChoice      PlacementChoice
+  levelProvided        String?
+  status               BookingStatus     @default(PENDING)
+  sessionsTotal        Int
+  subtotalAmount       Decimal           @db.Decimal(10, 2)
+  discountAmount       Decimal           @db.Decimal(10, 2)
+  couponCode           String?
+  finalAmount          Decimal           @db.Decimal(10, 2)
+  paymentMethod        String?
+  notes                String?
+  appointments         Appointment[]
+  coupon               Coupon?           @relation(fields: [couponId], references: [id])
+  couponId             String?
+  cashReceipt          AdminCashReceipt?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Appointment {
+  id           String            @id @default(uuid())
+  booking      Booking           @relation(fields: [bookingId], references: [id])
+  bookingId    String
+  user         User              @relation(fields: [userId], references: [id])
+  userId       String
+  course       Course            @relation("CourseAppointments", fields: [courseId], references: [id])
+  courseId     String
+  topic        Topic?            @relation(fields: [topicId], references: [id])
+  topicId      String?
+  startAt      DateTime
+  endAt        DateTime
+  status       AppointmentStatus @default(SCHEDULED)
+  teacherNotes String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AdminCashReceipt {
+  id               String   @id @default(uuid())
+  booking          Booking  @relation(fields: [bookingId], references: [id])
+  bookingId        String   @unique
+  amount           Decimal  @db.Decimal(10, 2)
+  currency         String
+  handledByAdmin   User     @relation("AdminReceipts", fields: [handledByAdminId], references: [id])
+  handledByAdminId String
+  createdAt        DateTime @default(now())
+}
