@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getDictionary, getLocale, isRTL } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { LanguageSwitch } from "@/components/language-switch";
+import { NavbarLanguageSwitch } from "@/components/navbar-language-switch";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +38,7 @@ export async function Navbar() {
           )}
         </nav>
         <div className="flex items-center gap-3">
-          <LanguageSwitch
+          <NavbarLanguageSwitch
             locale={locale}
             labels={{
               title: dict.common.language,
