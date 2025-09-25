@@ -32,13 +32,7 @@ export default async function HomePage() {
         </div>
         <div className="relative mx-auto aspect-square w-full max-w-sm">
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-500/20 via-sand to-brand-200" />
-          <Image
-            src={heroIllustration}
-            alt="Learn English Illustration"
-            fill
-            priority
-            className="relative object-contain"
-          />
+          <Image src={heroIllustration} alt={dict.home.heroAlt} fill priority className="relative object-contain" />
         </div>
       </section>
 
@@ -46,12 +40,10 @@ export default async function HomePage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="font-display text-3xl text-brand-800">{dict.home.categoriesTitle}</h2>
-            <p className="text-brand-600">
-              صُممت مسارات التعلم لدينا لتدعم مهارات المحادثة، الكتابة، والاستعداد للامتحانات الدولية.
-            </p>
+            <p className="text-brand-600">{dict.home.categoriesDescription}</p>
           </div>
           <Button asChild variant="ghost" className="self-start border border-emerald-500/40">
-            <Link href="/discovery">حجز جلسة تعريفية</Link>
+            <Link href="/discovery">{dict.home.discoveryCta}</Link>
           </Button>
         </div>
         <div className="container-grid">
@@ -63,9 +55,9 @@ export default async function HomePage() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-brand-600">
-                  <li>✔ جلسات مباشرة عبر الإنترنت</li>
-                  <li>✔ خطط مخصصة لأهدافك</li>
-                  <li>✔ متابعة تقدم أسبوعية</li>
+                  {dict.home.featureBullets.map((bullet) => (
+                    <li key={bullet}>✔ {bullet}</li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -75,13 +67,11 @@ export default async function HomePage() {
 
       <section className="grid gap-6 rounded-[40px] bg-brand-800 px-8 py-10 text-white lg:grid-cols-2">
         <div className="space-y-4">
-          <h3 className="font-display text-3xl">منصة شاملة للمتعلمين والإداريين</h3>
-          <p className="text-brand-50/80">
-            إدارة الدورات، الحصص، والمدفوعات النقدية من لوحة تحكم واحدة متوافقة مع الأجهزة المحمولة.
-          </p>
+          <h3 className="font-display text-3xl">{dict.home.platform.title}</h3>
+          <p className="text-brand-50/80">{dict.home.platform.description}</p>
         </div>
         <div className="grid gap-4 text-sm sm:grid-cols-2">
-          {["حجوزات ذكية", "تنبيهات خصومات", "دعم الكوبونات", "تقارير مالية"].map((item) => (
+          {dict.home.platform.highlights.map((item) => (
             <div key={item} className="rounded-3xl bg-white/10 p-4">
               <p className="font-medium">{item}</p>
             </div>
