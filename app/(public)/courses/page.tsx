@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getLocale, getDictionary } from "@/lib/i18n";
@@ -71,28 +70,24 @@ export default async function CoursesPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold text-brand-700">{coursesDict.difficulties.title}</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     {course.difficulties.map((difficulty) => (
-                      <Badge key={difficulty.id}>
-                        {difficulty.label} — {Number(difficulty.pricePerSession).toLocaleString(locale, {
-                          style: "currency",
-                          currency: "USD",
-                        })}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-brand-700">{coursesDict.topics.title}</h3>
-                  <div className="grid gap-2 text-sm text-brand-600">
-                    {course.topics.map((topic) => (
-                      <div key={topic.id} className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-2">
-                        <span>{topic.name}</span>
-                        <span className="text-xs text-brand-400">
-                          {coursesDict.topics.metaTemplate
-                            .replace("{{sessions}}", topic.sessionsRequired.toString())
-                            .replace("{{hours}}", topic.estimatedHours.toString())}
-                        </span>
+                      <div
+                        key={difficulty.id}
+                        className="rounded-3xl border border-emerald-200/60 bg-emerald-50/80 px-4 py-3 text-emerald-700 shadow-sm"
+                      >
+                        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+                          {difficulty.label}
+                        </p>
+                        <p className="mt-1 text-sm font-medium">
+                          {Number(difficulty.pricePerSession).toLocaleString(locale, {
+                            style: "currency",
+                            currency: "USD",
+                          })}{" "}
+                          <span className="text-xs font-normal text-emerald-600">
+                            · {coursesDict.difficulties.priceLabel}
+                          </span>
+                        </p>
                       </div>
                     ))}
                   </div>

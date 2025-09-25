@@ -30,6 +30,12 @@ export type BookingDictionary = {
   };
   placementOptions: Record<string, string>;
   form: {
+    levelCheck: {
+      title: string;
+      description: string;
+      knows: string;
+      unsure: string;
+    };
     course: {
       title: string;
       description: string;
@@ -37,6 +43,7 @@ export type BookingDictionary = {
     difficulty: {
       title: string;
       description: string;
+      priceLabel: string;
     };
     topics: {
       title: string;
