@@ -11,7 +11,7 @@ async function main() {
     },
     create: {
       email: "admin@learnenglish.com",
-      firebaseUid: "admin-seed-uid",
+      firebaseUid: "MPJp8uDukvMebwkFTBoUkhtRiYe2",
       name: "مشرف المنصة",
       phone: "+96100000000",
       role: Role.ADMIN,
