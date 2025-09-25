@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/db";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { AdminCatalogCourse } from "@/lib/types/admin";
 import { CatalogManager } from "@/components/admin/catalog/catalog-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCatalogPage() {
-  const locale = await getLocale();
+  const locale: Locale = "en";
   const dictionary = await getDictionary(locale);
 
   let courses: AdminCatalogCourse[] = [];

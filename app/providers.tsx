@@ -11,23 +11,23 @@ import { usePreferencesStore } from "@/stores/preferences";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient());
-  const locale = usePreferencesStore((state) => state.locale);
-  const setLocale = usePreferencesStore((state) => state.setLocale);
+  const language = usePreferencesStore((state) => state.language);
+  const setLanguage = usePreferencesStore((state) => state.setLanguage);
 
   useEffect(() => {
     const documentLocale = (document.documentElement.lang || DEFAULT_LOCALE) as Locale;
-    if (documentLocale !== locale) {
-      setLocale(documentLocale);
+    if (documentLocale !== language) {
+      setLanguage(documentLocale);
       applyLocaleToDocument(documentLocale);
     }
-  }, [locale, setLocale]);
+  }, [language, setLanguage]);
 
   return (
     <ThemeProvider>
       <QueryClientProvider client={client}>
         {children}
         <ReactQueryDevtools initialIsOpen={false} position="bottom" buttonPosition="bottom-left" />
-        <Toaster position="top-center" richColors dir={locale === "ar" ? "rtl" : "ltr"} />
+        <Toaster position="top-center" richColors dir={language === "ar" ? "rtl" : "ltr"} />
       </QueryClientProvider>
     </ThemeProvider>
   );

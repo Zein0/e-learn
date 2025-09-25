@@ -26,15 +26,15 @@ export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const persistedLocale = usePreferencesStore((state) => state.locale);
-  const setLocale = usePreferencesStore((state) => state.setLocale);
+  const persistedLanguage = usePreferencesStore((state) => state.language);
+  const setLanguage = usePreferencesStore((state) => state.setLanguage);
 
   useEffect(() => {
     const currentDocumentLocale = (document.documentElement.lang || DEFAULT_LOCALE) as Locale;
-    if (SUPPORTED_LOCALES.includes(currentDocumentLocale) && currentDocumentLocale !== persistedLocale) {
-      setLocale(currentDocumentLocale);
+    if (SUPPORTED_LOCALES.includes(currentDocumentLocale) && currentDocumentLocale !== persistedLanguage) {
+      setLanguage(currentDocumentLocale);
     }
-  }, [persistedLocale, setLocale]);
+  }, [persistedLanguage, setLanguage]);
 
   useEffect(() => {
     applyLocaleToDocument(locale);
@@ -46,7 +46,7 @@ export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
     }
 
     startTransition(async () => {
-      setLocale(nextLocale);
+      setLanguage(nextLocale);
       applyLocaleToDocument(nextLocale);
 
       await fetch("/api/locale", {

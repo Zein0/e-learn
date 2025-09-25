@@ -14,6 +14,17 @@ export function middleware(request: NextRequest) {
   const segments = pathname.split("/").filter(Boolean);
   const potentialLocale = segments[0] as Locale | undefined;
 
+  if (pathname.startsWith("/admin")) {
+    response.cookies.set({
+      name: LOCALE_COOKIE,
+      value: "en",
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return response;
+  }
+
   if (potentialLocale && SUPPORTED_LOCALES.includes(potentialLocale)) {
     response.cookies.set({
       name: LOCALE_COOKIE,

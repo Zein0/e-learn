@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 import { getDictionary, getLocale, isRTL } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language-switch";
 
+export const dynamic = "force-dynamic";
+
 export async function Navbar() {
   const locale = await getLocale();
   const dict = await getDictionary(locale);
   const dir = isRTL(locale) ? "rtl" : "ltr";
+  const user = await getCurrentUser();
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-brand-100/60 bg-sand/80 backdrop-blur-xl dark:bg-brand-900/80">
@@ -27,9 +31,11 @@ export async function Navbar() {
           <Link href="/discovery" className="hover:text-emerald-600">
             {dict.common.discovery}
           </Link>
-          <Link href="/admin" className="hover:text-emerald-600">
-            {dict.common.dashboard}
-          </Link>
+          {user?.role === "ADMIN" && (
+            <Link href="/admin" className="hover:text-emerald-600">
+              {dict.common.dashboard}
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           <LanguageSwitch

@@ -6,15 +6,15 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n-config";
 
 type PreferencesState = {
-  locale: Locale;
-  setLocale: (locale: Locale) => void;
+  language: Locale;
+  setLanguage: (language: Locale) => void;
 };
 
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
-      locale: DEFAULT_LOCALE,
-      setLocale: (locale) => set({ locale }),
+      language: DEFAULT_LOCALE,
+      setLanguage: (language) => set({ language }),
     }),
     {
       name: "preferences-store",
@@ -31,7 +31,7 @@ export const usePreferencesStore = create<PreferencesState>()(
         }
         return localStorage;
       }),
-      partialize: (state) => ({ locale: state.locale }),
+      partialize: (state) => ({ language: state.language }),
     },
   ),
 );

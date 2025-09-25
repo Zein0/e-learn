@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getDictionary, getLocale } from "@/lib/i18n";
 import { BookingForm } from "@/components/booking/booking-form";
@@ -6,6 +9,11 @@ import type { BookingCourse } from "@/lib/types/booking";
 export const dynamic = "force-dynamic";
 
 export default async function BookingPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 

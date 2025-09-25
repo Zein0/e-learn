@@ -1,7 +1,8 @@
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 
 import { prisma } from "@/lib/db";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { AdminDictionary } from "@/lib/types/admin";
 import { AdminCalendar } from "@/components/admin/calendar/admin-calendar";
 
@@ -20,7 +21,7 @@ type CalendarAppointment = {
 };
 
 export default async function AdminCalendarPage() {
-  const locale = await getLocale();
+  const locale: Locale = "en";
   const dictionary = await getDictionary(locale);
 
   const now = new Date();

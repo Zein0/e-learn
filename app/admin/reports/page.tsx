@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
-import { getDictionary, getLocale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { AdminDictionary } from "@/lib/types/admin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -34,7 +35,7 @@ function formatUtilization(copy: string, utilization: ReportsData["utilization"]
 }
 
 export default async function AdminReportsPage() {
-  const locale = await getLocale();
+  const locale: Locale = "en";
   const dictionary = await getDictionary(locale);
 
   const data: ReportsData = {
