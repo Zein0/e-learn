@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-sand text-brand-800 dark:bg-brand-900 dark:text-brand-50 antialiased;
+}
+
+.rtl * {
+  direction: rtl;
+}
+
+.ltr * {
+  direction: ltr;
+}
+
+.container-grid {
+  @apply grid gap-6 md:grid-cols-2 xl:grid-cols-3;
+}
+
+.card-gradient {
+  background: linear-gradient(135deg, rgba(62, 132, 103, 0.12), rgba(156, 118, 64, 0.12));
+}
+
+.shadow-soft {
+  box-shadow: 0 24px 60px rgba(38, 27, 13, 0.12);
+}
