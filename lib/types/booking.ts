@@ -65,6 +65,15 @@ export type BookingDictionary = {
         timezone: string;
         selected: string;
         sessionsNote: string;
+        viewModes: {
+          month: string;
+          week: string;
+        };
+        navigation: {
+          previous: string;
+          next: string;
+        };
+        weekLabel: string;
       };
     };
     summary: {
