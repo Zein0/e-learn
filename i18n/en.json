@@ -193,7 +193,16 @@
           "empty": "No upcoming slots are available right now. Please check back soon or contact support.",
           "timezone": "Times shown in {{timezone}}.",
           "selected": "Your {{count}} sessions will start on {{date}} at {{time}} and repeat every week.",
-          "sessionsNote": "Weekly sessions are locked once you confirm your booking."
+          "sessionsNote": "Weekly sessions are locked once you confirm your booking.",
+          "viewModes": {
+            "month": "Month",
+            "week": "Week"
+          },
+          "navigation": {
+            "previous": "Previous",
+            "next": "Next"
+          },
+          "weekLabel": "{{start}} – {{end}}"
         },
         "manualAvailability": {
           "title": "Pick any convenient time",

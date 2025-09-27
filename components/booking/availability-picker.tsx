@@ -33,6 +33,36 @@ type MonthEntry = {
   label: string;
 };
 
+type WeekEntry = {
+  key: string;
+  start: Date;
+  end: Date;
+  label: string;
+  days: {
+    key: string;
+    date: Date;
+    slotsCount: number;
+    isDisabled: boolean;
+  }[];
+};
+
+type ViewMode = "month" | "week";
+
+function getWeekStart(date: Date) {
+  const start = new Date(date);
+  const day = start.getDay();
+  const offset = (day + 6) % 7;
+  start.setDate(start.getDate() - offset);
+  return start;
+}
+
+function getWeekEnd(date: Date) {
+  const start = getWeekStart(date);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  return end;
+}
+
 export function AvailabilityPicker({ value, onChange, locale, sessions, dictionary }: AvailabilityPickerProps) {
   const availabilityQuery = useQuery<AvailabilityResponse>({
     queryKey: ["availability"],
@@ -141,7 +171,9 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
     });
   }, [groupedByDay, locale]);
 
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [selectedDayKey, setSelectedDayKey] = useState<string | undefined>();
 
   const weekdayLabels = useMemo(() => {
@@ -149,7 +181,7 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       timeZone: SYSTEM_TIMEZONE,
       weekday: "short",
     });
-    const reference = new Date(Date.UTC(2024, 0, 7));
+    const reference = new Date(Date.UTC(2024, 0, 1));
     return Array.from({ length: 7 }).map((_, index) => {
       const day = new Date(reference);
       day.setUTCDate(reference.getUTCDate() + index);
@@ -157,12 +189,76 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
     });
   }, [locale]);
 
+  const weeks = useMemo(() => {
+    if (!groupedByDay.length) return [] as WeekEntry[];
+
+    const sortedDays = groupedByDay
+      .map((entry) => entry.date)
+      .sort((a, b) => a.getTime() - b.getTime());
+    const overallStart = getWeekStart(sortedDays[0]);
+    const overallEnd = getWeekEnd(sortedDays[sortedDays.length - 1]);
+
+    const rangeFormatter = new Intl.DateTimeFormat(locale, {
+      timeZone: SYSTEM_TIMEZONE,
+      month: "long",
+      day: "numeric",
+    });
+
+    const result: WeekEntry[] = [];
+    const cursor = new Date(overallStart);
+
+    while (cursor.getTime() <= overallEnd.getTime()) {
+      const weekStart = new Date(cursor);
+      const weekEnd = new Date(cursor);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      const startLabel = rangeFormatter.format(weekStart);
+      const endLabel = rangeFormatter.format(weekEnd);
+      const label = dictionary.weekLabel
+        .replace("{{start}}", startLabel)
+        .replace("{{end}}", endLabel);
+
+      const days = Array.from({ length: 7 }).map((_, index) => {
+        const dayDate = new Date(weekStart);
+        dayDate.setDate(weekStart.getDate() + index);
+        const key = dayKeyFormatter.format(dayDate);
+        const dayEntry = dayMap.get(key);
+        const slotsCount = dayEntry?.slots.length ?? 0;
+        return {
+          key,
+          date: dayDate,
+          slotsCount,
+          isDisabled: slotsCount === 0,
+        };
+      });
+
+      result.push({
+        key: dayKeyFormatter.format(weekStart),
+        start: weekStart,
+        end: weekEnd,
+        label,
+        days,
+      });
+
+      cursor.setDate(cursor.getDate() + 7);
+    }
+
+    return result;
+  }, [dayKeyFormatter, dayMap, dictionary.weekLabel, groupedByDay, locale]);
+
   useEffect(() => {
     setCurrentMonthIndex((prev) => {
       if (!months.length) return 0;
       return Math.min(prev, Math.max(months.length - 1, 0));
     });
   }, [months.length]);
+
+  useEffect(() => {
+    setCurrentWeekIndex((prev) => {
+      if (!weeks.length) return 0;
+      return Math.min(prev, Math.max(weeks.length - 1, 0));
+    });
+  }, [weeks.length]);
 
   useEffect(() => {
     if (!value) return;
@@ -175,7 +271,11 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
     if (monthIndex !== -1) {
       setCurrentMonthIndex(monthIndex);
     }
-  }, [value, dayKeyFormatter, months]);
+    const weekIndex = weeks.findIndex((week) => week.days.some((day) => day.key === key));
+    if (weekIndex !== -1) {
+      setCurrentWeekIndex(weekIndex);
+    }
+  }, [value, dayKeyFormatter, months, weeks]);
 
   useEffect(() => {
     if (!selectedDayKey) return;
@@ -186,6 +286,14 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       }
     }
   }, [dayMap, onChange, selectedDayKey, value]);
+
+  useEffect(() => {
+    if (!selectedDayKey) return;
+    const weekIndex = weeks.findIndex((week) => week.days.some((day) => day.key === selectedDayKey));
+    if (weekIndex !== -1) {
+      setCurrentWeekIndex(weekIndex);
+    }
+  }, [selectedDayKey, weeks]);
 
   const selectedSlot = useMemo(() => {
     if (!value || !availabilityQuery.data?.slots) return undefined;
@@ -228,7 +336,8 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
 
     const monthStart = new Date(currentMonth.year, currentMonth.month, 1);
     const start = new Date(monthStart);
-    start.setDate(start.getDate() - start.getDay());
+    const offset = (start.getDay() + 6) % 7;
+    start.setDate(start.getDate() - offset);
 
     return Array.from({ length: 42 }).map((_, index) => {
       const dayDate = new Date(start);
@@ -252,8 +361,37 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
 
   const selectedDay = selectedDayKey ? dayMap.get(selectedDayKey) : undefined;
 
-  const canGoPrev = currentMonthIndex > 0;
-  const canGoNext = currentMonthIndex < months.length - 1;
+  const currentWeek = weeks[currentWeekIndex];
+
+  const canGoPrevMonth = currentMonthIndex > 0;
+  const canGoNextMonth = currentMonthIndex < months.length - 1;
+  const canGoPrevWeek = currentWeekIndex > 0;
+  const canGoNextWeek = currentWeekIndex < weeks.length - 1;
+
+  const canGoPrev = viewMode === "month" ? canGoPrevMonth : canGoPrevWeek;
+  const canGoNext = viewMode === "month" ? canGoNextMonth : canGoNextWeek;
+
+  const handlePrev = () => {
+    if (viewMode === "month") {
+      if (canGoPrevMonth) {
+        setCurrentMonthIndex((index) => Math.max(index - 1, 0));
+      }
+    } else if (canGoPrevWeek) {
+      setCurrentWeekIndex((index) => Math.max(index - 1, 0));
+    }
+  };
+
+  const handleNext = () => {
+    if (viewMode === "month") {
+      if (canGoNextMonth) {
+        setCurrentMonthIndex((index) => Math.min(index + 1, months.length - 1));
+      }
+    } else if (canGoNextWeek) {
+      setCurrentWeekIndex((index) => Math.min(index + 1, weeks.length - 1));
+    }
+  };
+
+  const currentLabel = viewMode === "month" ? currentMonth?.label : currentWeek?.label;
 
   const handleDaySelect = (dayKey: string) => {
     if (selectedDayKey !== dayKey) {
@@ -282,66 +420,125 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       ) : (
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="rounded-3xl border border-brand-100 bg-white/70 p-4 shadow-sm lg:flex-1">
-            <div className="mb-4 flex items-center justify-between">
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                disabled={!canGoPrev}
-                onClick={() => canGoPrev && setCurrentMonthIndex((index) => Math.max(index - 1, 0))}
-                className="h-8 w-8 rounded-full p-0 text-lg"
-              >
-                &lsaquo;
-              </Button>
-              <p className="text-sm font-semibold text-brand-700">{currentMonth?.label}</p>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                disabled={!canGoNext}
-                onClick={() => canGoNext && setCurrentMonthIndex((index) => Math.min(index + 1, months.length - 1))}
-                className="h-8 w-8 rounded-full p-0 text-lg"
-              >
-                &rsaquo;
-              </Button>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="inline-flex rounded-full bg-brand-50 p-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "month" ? "default" : "ghost"}
+                  className={`rounded-full px-4 ${viewMode === "month" ? "bg-brand-500 text-white hover:bg-brand-500" : "text-brand-600"}`}
+                  onClick={() => setViewMode("month")}
+                  aria-pressed={viewMode === "month"}
+                >
+                  {dictionary.viewModes.month}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "week" ? "default" : "ghost"}
+                  className={`rounded-full px-4 ${viewMode === "week" ? "bg-brand-500 text-white hover:bg-brand-500" : "text-brand-600"}`}
+                  onClick={() => setViewMode("week")}
+                  aria-pressed={viewMode === "week"}
+                >
+                  {dictionary.viewModes.week}
+                </Button>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!canGoPrev}
+                  onClick={handlePrev}
+                  className="h-8 w-8 rounded-full p-0 text-lg"
+                  aria-label={dictionary.navigation.previous}
+                >
+                  &lsaquo;
+                </Button>
+                <p className="text-sm font-semibold text-brand-700">{currentLabel}</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!canGoNext}
+                  onClick={handleNext}
+                  className="h-8 w-8 rounded-full p-0 text-lg"
+                  aria-label={dictionary.navigation.next}
+                >
+                  &rsaquo;
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-400">
               {weekdayLabels.map((weekday) => (
                 <span key={weekday}>{weekday}</span>
               ))}
             </div>
-            <div className="mt-2 grid grid-cols-7 gap-2">
-              {calendarDays.map((day) => {
-                const isSelected = day.isSelected;
-                const baseClasses =
-                  "flex h-20 flex-col items-center justify-center rounded-2xl border text-sm transition";
-                const stateClasses = day.isDisabled
-                  ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
-                  : isSelected
-                    ? "border-brand-500 bg-brand-500 text-white shadow-md"
-                    : day.isCurrentMonth
-                      ? "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50"
-                      : "border-transparent bg-brand-50/30 text-brand-300";
-                return (
-                  <button
-                    key={`${day.key}-${day.date.getDate()}`}
-                    type="button"
-                    disabled={day.isDisabled}
-                    onClick={() => handleDaySelect(day.key)}
-                    className={`${baseClasses} ${stateClasses}`}
-                  >
-                    <span className="text-base font-semibold">{day.date.getDate()}</span>
-                    <span
-                      className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
-                        isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
-                      }`}
+            {viewMode === "month" ? (
+              <div className="mt-2 grid grid-cols-7 gap-2">
+                {calendarDays.map((day) => {
+                  const isSelected = day.isSelected;
+                  const baseClasses =
+                    "flex h-20 flex-col items-center justify-center rounded-2xl border text-sm transition";
+                  const stateClasses = day.isDisabled
+                    ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
+                    : isSelected
+                      ? "border-brand-500 bg-brand-500 text-white shadow-md"
+                      : day.isCurrentMonth
+                        ? "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50"
+                        : "border-transparent bg-brand-50/30 text-brand-300";
+                  return (
+                    <button
+                      key={`${day.key}-${day.date.getDate()}`}
+                      type="button"
+                      disabled={day.isDisabled}
+                      onClick={() => handleDaySelect(day.key)}
+                      className={`${baseClasses} ${stateClasses}`}
                     >
-                      {day.slotsCount}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                      <span className="text-base font-semibold">{day.date.getDate()}</span>
+                      <span
+                        className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
+                          isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
+                        }`}
+                      >
+                        {day.slotsCount}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                {currentWeek?.days.map((day) => {
+                  const isSelected = selectedDayKey === day.key;
+                  const baseClasses =
+                    "flex min-h-[5.5rem] flex-col items-center justify-center rounded-2xl border text-sm transition";
+                  const stateClasses = day.isDisabled
+                    ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
+                    : isSelected
+                      ? "border-brand-500 bg-brand-500 text-white shadow-md"
+                      : "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50";
+                  return (
+                    <button
+                      key={`${day.key}-${day.date.getDate()}`}
+                      type="button"
+                      disabled={day.isDisabled}
+                      onClick={() => handleDaySelect(day.key)}
+                      className={`${baseClasses} ${stateClasses}`}
+                    >
+                      <span className="text-base font-semibold">{day.date.getDate()}</span>
+                      <span
+                        className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
+                          isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
+                        }`}
+                      >
+                        {day.slotsCount}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <div className="rounded-3xl border border-brand-100 bg-white/70 p-4 shadow-sm lg:w-[320px] xl:w-[360px]">
             {selectedDay ? (
