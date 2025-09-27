@@ -1,4 +1,4 @@
-import type { CourseType, DifficultyLabel } from "@prisma/client";
+import type { CourseType } from "@prisma/client";
 
 export type TranslatedField = {
   en: string;
@@ -10,16 +10,16 @@ export type AdminCatalogCourse = {
   title: TranslatedField;
   description: TranslatedField;
   type: CourseType;
-  category: string;
+  category: TranslatedField;
   difficulties: {
     id: string;
-    label: DifficultyLabel;
+    name: TranslatedField;
     pricePerSession: number;
   }[];
   topics: {
     id: string;
-    name: string;
-    description: string | null;
+    name: TranslatedField;
+    description: TranslatedField | null;
     sessionsRequired: number;
     estimatedHours: number;
     order: number;
@@ -43,7 +43,8 @@ export type AdminCatalogDictionary = {
     nameArLabel: string;
     descriptionEnLabel: string;
     descriptionArLabel: string;
-    categoryLabel: string;
+    categoryEnLabel: string;
+    categoryArLabel: string;
     typeLabel: string;
     typeOptions: Record<CourseType, string>;
     submit: string;
@@ -71,6 +72,8 @@ export type AdminCatalogDictionary = {
     metadataTitle: string;
     typeLabel: string;
     categoryLabel: string;
+    categoryLabelEn: string;
+    categoryLabelAr: string;
     summaryTitle: string;
     summaryDescription: string;
     difficultiesCountLabel: string;
@@ -86,10 +89,10 @@ export type AdminCatalogDictionary = {
     existingTitle: string;
     priceLabel: string;
     addTitle: string;
-    labelPlaceholder: string;
+    nameEnPlaceholder: string;
+    nameArPlaceholder: string;
     pricePlaceholder: string;
     submit: string;
-    labels: Record<DifficultyLabel, string>;
     backToCourse: string;
     manageTopics: string;
     empty: string;
@@ -101,8 +104,10 @@ export type AdminCatalogDictionary = {
     addButton: string;
     formTitle: string;
     editTitle: string;
-    nameLabel: string;
-    descriptionLabel: string;
+    nameEnLabel: string;
+    nameArLabel: string;
+    descriptionEnLabel: string;
+    descriptionArLabel: string;
     sessionsLabel: string;
     hoursLabel: string;
     orderLabel: string;

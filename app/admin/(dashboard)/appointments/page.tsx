@@ -22,7 +22,10 @@ export default async function AdminAppointmentsPage() {
       id: appointment.id,
       learner: appointment.user.name ?? appointment.user.email,
       course: locale === "ar" ? appointment.course.titleAr : appointment.course.titleEn,
-      topic: appointment.topic?.name ?? "—",
+      topic:
+        appointment.topic
+          ? locale === "ar" ? appointment.topic.nameAr : appointment.topic.nameEn
+          : "—",
       startAt: appointment.startAt.toISOString(),
       endAt: appointment.endAt.toISOString(),
       status: appointment.status,

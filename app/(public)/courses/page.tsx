@@ -80,7 +80,7 @@ export default async function CoursesPage() {
                         className="rounded-3xl border border-emerald-200/60 bg-emerald-50/80 px-4 py-3 text-emerald-700 shadow-sm"
                       >
                         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
-                          {difficulty.label}
+                          {difficulty.name}
                         </p>
                         <p className="mt-1 text-sm font-medium">
                           {Number(difficulty.pricePerSession).toLocaleString(locale, {

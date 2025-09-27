@@ -48,7 +48,10 @@ export default async function AdminCalendarPage() {
       id: record.id,
       learner: record.user.name ?? record.user.email,
       course: locale === "ar" ? record.course.titleAr : record.course.titleEn,
-      topic: record.topic?.name ?? null,
+      topic:
+        record.topic?.nameEn && record.topic?.nameAr
+          ? locale === "ar" ? record.topic.nameAr : record.topic.nameEn
+          : null,
       startAt: record.startAt.toISOString(),
       endAt: record.endAt.toISOString(),
       status: record.status,

@@ -33,15 +33,15 @@ export default async function BookingPage() {
       title: locale === "ar" ? course.titleAr : course.titleEn,
       description: locale === "ar" ? course.descriptionAr : course.descriptionEn,
       type: course.type,
-      category: course.category,
+      category: locale === "ar" ? course.categoryAr : course.categoryEn,
       difficulties: course.difficulties.map((difficulty) => ({
         id: difficulty.id,
-        label: difficulty.label,
+        name: locale === "ar" ? difficulty.nameAr : difficulty.nameEn,
         pricePerSession: Number(difficulty.pricePerSession),
       })),
       topics: course.topics.map((topic) => ({
         id: topic.id,
-        name: topic.name,
+        name: locale === "ar" ? topic.nameAr : topic.nameEn,
         sessionsRequired: topic.sessionsRequired,
         estimatedHours: topic.estimatedHours,
         difficultyId: topic.difficultyId,

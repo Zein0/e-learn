@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export type CashBookingCourse = {
   id: string;
   title: string;
-  difficulties: { id: string; label: string; pricePerSession: number }[];
+  difficulties: { id: string; name: string; pricePerSession: number }[];
   topics: { id: string; name: string; sessionsRequired: number; difficultyId: string }[];
 };
 
@@ -204,7 +204,7 @@ export function CashBookingForm({ courses }: { courses: CashBookingCourse[] }) {
                 variant={difficulty.id === selectedDifficulty?.id ? "default" : "outline"}
                 onClick={() => updateField("difficultyId", difficulty.id)}
               >
-                {difficulty.label}
+                {difficulty.name}
               </Button>
             ))}
           </div>

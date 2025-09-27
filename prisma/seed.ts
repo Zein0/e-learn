@@ -1,4 +1,4 @@
-import { PrismaClient, CourseType, DifficultyLabel, Role } from "@prisma/client";
+import { PrismaClient, CourseType, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -28,7 +28,8 @@ async function main() {
         "Practical coaching that strengthens speaking fluency through real-life scenarios and guided workshops.",
       descriptionAr:
         "برنامج عملي يركز على تحسين الطلاقة في التحدث من خلال مواقف حياتية وورش عمل مع المدرب.",
-      category: "مهارات المحادثة",
+      categoryEn: "Conversation Skills",
+      categoryAr: "مهارات المحادثة",
       type: CourseType.PRIVATE,
     },
     create: {
@@ -38,7 +39,8 @@ async function main() {
         "Practical coaching that strengthens speaking fluency through real-life scenarios and guided workshops.",
       descriptionAr:
         "برنامج عملي يركز على تحسين الطلاقة في التحدث من خلال مواقف حياتية وورش عمل مع المدرب.",
-      category: "مهارات المحادثة",
+      categoryEn: "Conversation Skills",
+      categoryAr: "مهارات المحادثة",
       type: CourseType.PRIVATE,
     },
   });
@@ -46,80 +48,95 @@ async function main() {
   console.info(`✔️ Course ready: ${conversationCourse.titleEn} / ${conversationCourse.titleAr}`);
 
   const difficultyData = [
-    { label: DifficultyLabel.BEGINNER, pricePerSession: "20.00" },
-    { label: DifficultyLabel.INTERMEDIATE, pricePerSession: "25.00" },
-    { label: DifficultyLabel.ADVANCED, pricePerSession: "30.00" },
+    { key: "BEGINNER", nameEn: "Beginner", nameAr: "مبتدئ", pricePerSession: "20.00" },
+    { key: "INTERMEDIATE", nameEn: "Intermediate", nameAr: "متوسط", pricePerSession: "25.00" },
+    { key: "ADVANCED", nameEn: "Advanced", nameAr: "متقدم", pricePerSession: "30.00" },
   ];
 
-  const difficulties = [] as Array<{ id: string; label: DifficultyLabel }>;
+  const difficulties = [] as Array<{ id: string; key: string }>;
 
   for (const difficulty of difficultyData) {
     const record = await prisma.courseDifficulty.upsert({
       where: {
-        courseId_label: {
+        courseId_nameEn: {
           courseId: conversationCourse.id,
-          label: difficulty.label,
+          nameEn: difficulty.nameEn,
         },
       },
       update: {
+        nameEn: difficulty.nameEn,
+        nameAr: difficulty.nameAr,
         pricePerSession: difficulty.pricePerSession,
       },
       create: {
         courseId: conversationCourse.id,
-        label: difficulty.label,
+        nameEn: difficulty.nameEn,
+        nameAr: difficulty.nameAr,
         pricePerSession: difficulty.pricePerSession,
       },
     });
 
-    difficulties.push({ id: record.id, label: record.label });
+    difficulties.push({ id: record.id, key: difficulty.key });
   }
 
   console.info(`✔️ Difficulties prepared: ${difficulties.length}`);
 
-  const topicsByDifficulty: Record<DifficultyLabel, Array<{ name: string; description: string; sessions: number; hours: number; order: number }>> = {
-    [DifficultyLabel.BEGINNER]: [
+  const topicsByDifficulty: Record<string, Array<{ nameEn: string; nameAr: string; descriptionEn: string; descriptionAr: string; sessions: number; hours: number; order: number }>> = {
+    BEGINNER: [
       {
-        name: "أساسيات التعارف",
-        description: "كلمات وجمل للتعريف عن الذات وتبادل المعلومات الشخصية.",
+        nameEn: "Introductions",
+        nameAr: "أساسيات التعارف",
+        descriptionEn: "Introduce yourself and exchange personal details confidently.",
+        descriptionAr: "كلمات وجمل للتعريف عن الذات وتبادل المعلومات الشخصية.",
         sessions: 3,
         hours: 4,
         order: 1,
       },
       {
-        name: "مفردات الحياة اليومية",
-        description: "مفردات المشتريات، المطاعم، والتنقل داخل المدينة.",
+        nameEn: "Everyday Vocabulary",
+        nameAr: "مفردات الحياة اليومية",
+        descriptionEn: "Key phrases for shopping, dining out, and navigating the city.",
+        descriptionAr: "مفردات المشتريات، المطاعم، والتنقل داخل المدينة.",
         sessions: 4,
         hours: 5,
         order: 2,
       },
     ],
-    [DifficultyLabel.INTERMEDIATE]: [
+    INTERMEDIATE: [
       {
-        name: "نقاشات مهنية",
-        description: "تطوير القدرة على النقاش في الاجتماعات وتقديم الآراء بوضوح.",
+        nameEn: "Professional Discussions",
+        nameAr: "نقاشات مهنية",
+        descriptionEn: "Strengthen meeting participation and present opinions clearly.",
+        descriptionAr: "تطوير القدرة على النقاش في الاجتماعات وتقديم الآراء بوضوح.",
         sessions: 4,
         hours: 6,
         order: 1,
       },
       {
-        name: "كتابة البريد المهني",
-        description: "صياغة رسائل إلكترونية احترافية مع التركيز على النبرة والأسلوب.",
+        nameEn: "Business Email Writing",
+        nameAr: "كتابة البريد المهني",
+        descriptionEn: "Craft professional emails with the right tone and structure.",
+        descriptionAr: "صياغة رسائل إلكترونية احترافية مع التركيز على النبرة والأسلوب.",
         sessions: 3,
         hours: 4,
         order: 2,
       },
     ],
-    [DifficultyLabel.ADVANCED]: [
+    ADVANCED: [
       {
-        name: "العروض التقديمية",
-        description: "هيكلة عرض متكامل مع أساليب الإقناع والتفاعل مع الجمهور.",
+        nameEn: "Presentations",
+        nameAr: "العروض التقديمية",
+        descriptionEn: "Structure persuasive presentations and engage any audience.",
+        descriptionAr: "هيكلة عرض متكامل مع أساليب الإقناع والتفاعل مع الجمهور.",
         sessions: 4,
         hours: 6,
         order: 1,
       },
       {
-        name: "المفاوضات",
-        description: "تقنيات التفاوض والرد على الاعتراضات باللغة الإنجليزية بطلاقة.",
+        nameEn: "Negotiations",
+        nameAr: "المفاوضات",
+        descriptionEn: "Negotiation techniques and handling objections fluently.",
+        descriptionAr: "تقنيات التفاوض والرد على الاعتراضات باللغة الإنجليزية بطلاقة.",
         sessions: 5,
         hours: 7,
         order: 2,
@@ -128,13 +145,13 @@ async function main() {
   };
 
   for (const difficulty of difficulties) {
-    const topics = topicsByDifficulty[difficulty.label];
+    const topics = topicsByDifficulty[difficulty.key];
     if (!topics) continue;
 
     for (const topic of topics) {
       const existing = await prisma.topic.findFirst({
         where: {
-          name: topic.name,
+          nameEn: topic.nameEn,
           courseId: conversationCourse.id,
           difficultyId: difficulty.id,
         },
@@ -144,7 +161,10 @@ async function main() {
         await prisma.topic.update({
           where: { id: existing.id },
           data: {
-            description: topic.description,
+            nameEn: topic.nameEn,
+            nameAr: topic.nameAr,
+            descriptionEn: topic.descriptionEn,
+            descriptionAr: topic.descriptionAr,
             sessionsRequired: topic.sessions,
             estimatedHours: topic.hours,
             order: topic.order,
@@ -153,8 +173,10 @@ async function main() {
       } else {
         await prisma.topic.create({
           data: {
-            name: topic.name,
-            description: topic.description,
+            nameEn: topic.nameEn,
+            nameAr: topic.nameAr,
+            descriptionEn: topic.descriptionEn,
+            descriptionAr: topic.descriptionAr,
             sessionsRequired: topic.sessions,
             estimatedHours: topic.hours,
             order: topic.order,

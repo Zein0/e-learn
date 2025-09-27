@@ -17,12 +17,6 @@ enum CourseType {
   CLASSROOM
 }
 
-enum DifficultyLabel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-}
-
 enum CouponType {
   PERCENT
   FLAT
@@ -70,7 +64,8 @@ model Course {
   descriptionEn String
   descriptionAr String
   type          CourseType
-  category      String
+  categoryEn    String
+  categoryAr    String
   difficulties  CourseDifficulty[]
   topics        Topic[]
   discountRules DiscountRule[]
@@ -84,19 +79,23 @@ model CourseDifficulty {
   id              String         @id @default(uuid())
   course          Course         @relation(fields: [courseId], references: [id])
   courseId        String
-  label           DifficultyLabel
+  nameEn          String
+  nameAr          String
   pricePerSession Decimal @db.Decimal(10, 2)
   topics          Topic[]
   bookings        Booking[] @relation("BookingDifficulty")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  @@unique([courseId, label])
+  @@unique([courseId, nameEn])
+  @@unique([courseId, nameAr])
 }
 
 model Topic {
   id               String    @id @default(uuid())
-  name             String
-  description      String?
+  nameEn           String
+  nameAr           String
+  descriptionEn    String?
+  descriptionAr    String?
   sessionsRequired Int
   estimatedHours   Int
   order            Int

@@ -1,5 +1,3 @@
-import type { DifficultyLabel } from "@prisma/client";
-
 export type BookingCourse = {
   id: string;
   title: string;
@@ -8,7 +6,7 @@ export type BookingCourse = {
   category: string;
   difficulties: {
     id: string;
-    label: DifficultyLabel;
+    name: string;
     pricePerSession: number;
   }[];
   topics: {
