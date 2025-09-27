@@ -13,8 +13,10 @@ async function ensureAdmin() {
 
 type TopicPayload = {
   difficultyId?: string;
-  name?: string;
-  description?: string;
+  nameEn?: string;
+  nameAr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
   sessionsRequired?: number;
   estimatedHours?: number;
   order?: number;
@@ -29,13 +31,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
     await ensureAdmin();
     const { id: courseId } = params;
     const payload = (await request.json()) as TopicPayload;
-    const { difficultyId, name, description, sessionsRequired, estimatedHours, order } = payload;
+    const { difficultyId, nameEn, nameAr, descriptionEn, descriptionAr, sessionsRequired, estimatedHours, order } = payload;
     const sessionsValue =
       typeof sessionsRequired === "string" ? Number(sessionsRequired) : sessionsRequired;
     const hoursValue = typeof estimatedHours === "string" ? Number(estimatedHours) : estimatedHours;
     const orderValue = typeof order === "string" ? Number(order) : order;
 
-    if (!courseId || !difficultyId || !name || sessionsValue === undefined) {
+    if (!courseId || !difficultyId || !nameEn || !nameAr || sessionsValue === undefined) {
       return NextResponse.json({ error: "بيانات غير مكتملة" }, { status: 400 });
     }
 
@@ -63,8 +65,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
       data: {
         courseId,
         difficultyId,
-        name,
-        description: description ?? null,
+        nameEn,
+        nameAr,
+        descriptionEn: descriptionEn ?? null,
+        descriptionAr: descriptionAr ?? null,
         sessionsRequired: sessionsValue,
         estimatedHours: hoursValue ?? sessionsValue,
         order: nextOrder,
@@ -85,7 +89,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   try {
     await ensureAdmin();
     const { id: courseId } = params;
-    const { topicId, difficultyId, name, description, sessionsRequired, estimatedHours, order } =
+    const { topicId, difficultyId, nameEn, nameAr, descriptionEn, descriptionAr, sessionsRequired, estimatedHours, order } =
       (await request.json()) as TopicPatchPayload;
     const sessionsValue =
       typeof sessionsRequired === "string" ? Number(sessionsRequired) : sessionsRequired;
@@ -111,12 +115,20 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       data.difficulty = { connect: { id: difficultyId } };
     }
 
-    if (name) {
-      data.name = name;
+    if (nameEn) {
+      data.nameEn = nameEn;
     }
 
-    if (description !== undefined) {
-      data.description = description;
+    if (nameAr) {
+      data.nameAr = nameAr;
+    }
+
+    if (descriptionEn !== undefined) {
+      data.descriptionEn = descriptionEn === null ? null : descriptionEn;
+    }
+
+    if (descriptionAr !== undefined) {
+      data.descriptionAr = descriptionAr === null ? null : descriptionAr;
     }
 
     if (sessionsValue !== undefined) {

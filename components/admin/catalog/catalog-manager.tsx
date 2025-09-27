@@ -20,18 +20,22 @@ type CourseFormState = {
   titleAr: string;
   descriptionEn: string;
   descriptionAr: string;
-  category: string;
+  categoryEn: string;
+  categoryAr: string;
   type: AdminCatalogCourse["type"];
 };
 
 type DifficultyDraft = {
-  label: AdminCatalogCourse["difficulties"][number]["label"] | "";
+  nameEn: string;
+  nameAr: string;
   price: string;
 };
 
 type TopicFormState = {
-  name: string;
-  description: string;
+  nameEn: string;
+  nameAr: string;
+  descriptionEn: string;
+  descriptionAr: string;
   sessionsRequired: string;
   estimatedHours: string;
   order: string;
@@ -42,20 +46,24 @@ const DEFAULT_COURSE_FORM: CourseFormState = {
   titleAr: "",
   descriptionEn: "",
   descriptionAr: "",
-  category: "",
+  categoryEn: "",
+  categoryAr: "",
   type: "PRIVATE",
 };
 
 const DEFAULT_TOPIC_STATE: TopicFormState = {
-  name: "",
-  description: "",
+  nameEn: "",
+  nameAr: "",
+  descriptionEn: "",
+  descriptionAr: "",
   sessionsRequired: "",
   estimatedHours: "",
   order: "",
 };
 
 const DEFAULT_DIFFICULTY_DRAFT: DifficultyDraft = {
-  label: "",
+  nameEn: "",
+  nameAr: "",
   price: "",
 };
 
@@ -84,7 +92,7 @@ function sortTopics(topics: AdminCatalogCourse["topics"]) {
 function normalizeCourse(course: AdminCatalogCourse): AdminCatalogCourse {
   return {
     ...course,
-    difficulties: [...course.difficulties].sort((a, b) => a.label.localeCompare(b.label)),
+    difficulties: [...course.difficulties].sort((a, b) => a.name.en.localeCompare(b.name.en)),
     topics: sortTopics(course.topics),
   };
 }
@@ -194,7 +202,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       !courseForm.titleAr.trim() ||
       !courseForm.descriptionEn.trim() ||
       !courseForm.descriptionAr.trim() ||
-      !courseForm.category.trim()
+      !courseForm.categoryEn.trim() ||
+      !courseForm.categoryAr.trim()
     ) {
       toast.error(dictionary.feedback.errorGeneric);
       return;
@@ -210,7 +219,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
           titleAr: courseForm.titleAr.trim(),
           descriptionEn: courseForm.descriptionEn.trim(),
           descriptionAr: courseForm.descriptionAr.trim(),
-          category: courseForm.category.trim(),
+          categoryEn: courseForm.categoryEn.trim(),
+          categoryAr: courseForm.categoryAr.trim(),
           type: courseForm.type,
         }),
       });
@@ -225,7 +235,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
           descriptionEn: string;
           descriptionAr: string;
           type: AdminCatalogCourse["type"];
-          category: string;
+          categoryEn: string;
+          categoryAr: string;
         };
       };
       const newCourse: AdminCatalogCourse = normalizeCourse({
@@ -233,7 +244,7 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
         title: { en: data.course.titleEn, ar: data.course.titleAr },
         description: { en: data.course.descriptionEn, ar: data.course.descriptionAr },
         type: data.course.type,
-        category: data.course.category,
+        category: { en: data.course.categoryEn, ar: data.course.categoryAr },
         difficulties: [],
         topics: [],
       });
@@ -258,7 +269,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
         titleAr: course.title.ar,
         descriptionEn: course.description.en,
         descriptionAr: course.description.ar,
-        category: course.category,
+        categoryEn: course.category.en,
+        categoryAr: course.category.ar,
         type: course.type,
       },
     }));
@@ -272,7 +284,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       !form.titleAr.trim() ||
       !form.descriptionEn.trim() ||
       !form.descriptionAr.trim() ||
-      !form.category.trim()
+      !form.categoryEn.trim() ||
+      !form.categoryAr.trim()
     ) {
       toast.error(dictionary.feedback.errorGeneric);
       return;
@@ -289,7 +302,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
           titleAr: form.titleAr.trim(),
           descriptionEn: form.descriptionEn.trim(),
           descriptionAr: form.descriptionAr.trim(),
-          category: form.category.trim(),
+          categoryEn: form.categoryEn.trim(),
+          categoryAr: form.categoryAr.trim(),
           type: form.type,
         }),
       });
@@ -304,14 +318,15 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
           descriptionEn: string;
           descriptionAr: string;
           type: AdminCatalogCourse["type"];
-          category: string;
+          categoryEn: string;
+          categoryAr: string;
         };
       };
       updateCourseState(courseId, (course) => ({
         ...course,
         title: { en: data.course.titleEn, ar: data.course.titleAr },
         description: { en: data.course.descriptionEn, ar: data.course.descriptionAr },
-        category: data.course.category,
+        category: { en: data.course.categoryEn, ar: data.course.categoryAr },
         type: data.course.type,
       }));
       setEditingCourseId(null);
@@ -326,7 +341,7 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
 
   const handleCreateDifficulty = async (courseId: string) => {
     const draft = difficultyDrafts[courseId] ?? DEFAULT_DIFFICULTY_DRAFT;
-    if (!draft.label || !draft.price.trim()) {
+    if (!draft.nameEn.trim() || !draft.nameAr.trim() || !draft.price.trim()) {
       toast.error(dictionary.feedback.errorGeneric);
       return;
     }
@@ -343,7 +358,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          label: draft.label,
+          nameEn: draft.nameEn.trim(),
+          nameAr: draft.nameAr.trim(),
           pricePerSession: priceValue,
         }),
       });
@@ -353,13 +369,14 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       const data = (await response.json()) as {
         difficulty: {
           id: string;
-          label: AdminCatalogCourse["difficulties"][number]["label"];
+          nameEn: string;
+          nameAr: string;
           pricePerSession: number | string;
         };
       };
       const difficulty = {
         id: data.difficulty.id,
-        label: data.difficulty.label,
+        name: { en: data.difficulty.nameEn, ar: data.difficulty.nameAr },
         pricePerSession: Number(data.difficulty.pricePerSession),
       };
       updateCourseState(courseId, (course) => ({
@@ -406,13 +423,14 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       const data = (await response.json()) as {
         difficulty: {
           id: string;
-          label: AdminCatalogCourse["difficulties"][number]["label"];
+          nameEn: string;
+          nameAr: string;
           pricePerSession: number | string;
         };
       };
       const difficulty = {
         id: data.difficulty.id,
-        label: data.difficulty.label,
+        name: { en: data.difficulty.nameEn, ar: data.difficulty.nameAr },
         pricePerSession: Number(data.difficulty.pricePerSession),
       };
       updateCourseState(courseId, (course) => ({
@@ -432,7 +450,11 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
     if (!activeDifficultyId) {
       return;
     }
-    if (!topicForm.name.trim() || !topicForm.sessionsRequired.trim()) {
+    if (
+      !topicForm.nameEn.trim() ||
+      !topicForm.nameAr.trim() ||
+      !topicForm.sessionsRequired.trim()
+    ) {
       toast.error(dictionary.feedback.errorGeneric);
       return;
     }
@@ -440,6 +462,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
     const sessions = Number(topicForm.sessionsRequired);
     const hours = topicForm.estimatedHours ? Number(topicForm.estimatedHours) : undefined;
     const order = topicForm.order ? Number(topicForm.order) : undefined;
+    const descriptionEnValue = topicForm.descriptionEn.trim();
+    const descriptionArValue = topicForm.descriptionAr.trim();
 
     if (!Number.isFinite(sessions) || sessions <= 0) {
       toast.error(dictionary.feedback.errorGeneric);
@@ -461,8 +485,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           difficultyId: activeDifficultyId,
-          name: topicForm.name.trim(),
-          description: topicForm.description.trim() || undefined,
+          nameEn: topicForm.nameEn.trim(),
+          nameAr: topicForm.nameAr.trim(),
+          descriptionEn: descriptionEnValue ? descriptionEnValue : null,
+          descriptionAr: descriptionArValue ? descriptionArValue : null,
           sessionsRequired: sessions,
           estimatedHours: hours,
           order,
@@ -474,8 +500,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       const data = (await response.json()) as {
         topic: {
           id: string;
-          name: string;
-          description: string | null;
+          nameEn: string;
+          nameAr: string;
+          descriptionEn: string | null;
+          descriptionAr: string | null;
           sessionsRequired: number | string;
           estimatedHours: number | string;
           order: number | string;
@@ -484,8 +512,11 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       };
       const topic = {
         id: data.topic.id,
-        name: data.topic.name,
-        description: data.topic.description,
+        name: { en: data.topic.nameEn, ar: data.topic.nameAr },
+        description:
+          data.topic.descriptionEn || data.topic.descriptionAr
+            ? { en: data.topic.descriptionEn ?? "", ar: data.topic.descriptionAr ?? "" }
+            : null,
         sessionsRequired: Number(data.topic.sessionsRequired),
         estimatedHours: Number(data.topic.estimatedHours),
         order: Number(data.topic.order),
@@ -515,8 +546,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
     setTopicEdits((previous) => ({
       ...previous,
       [topic.id]: {
-        name: topic.name,
-        description: topic.description ?? "",
+        nameEn: topic.name.en,
+        nameAr: topic.name.ar,
+        descriptionEn: topic.description?.en ?? "",
+        descriptionAr: topic.description?.ar ?? "",
         sessionsRequired: String(topic.sessionsRequired),
         estimatedHours: String(topic.estimatedHours),
         order: String(topic.order),
@@ -527,7 +560,11 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
   const handleUpdateTopic = async (courseId: string, topicId: string) => {
     const form = topicEdits[topicId];
     if (!form) return;
-    if (!form.name.trim() || !form.sessionsRequired.trim()) {
+    if (
+      !form.nameEn.trim() ||
+      !form.nameAr.trim() ||
+      !form.sessionsRequired.trim()
+    ) {
       toast.error(dictionary.feedback.errorGeneric);
       return;
     }
@@ -535,6 +572,8 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
     const sessions = Number(form.sessionsRequired);
     const hours = form.estimatedHours ? Number(form.estimatedHours) : undefined;
     const order = form.order ? Number(form.order) : undefined;
+    const descriptionEnValue = form.descriptionEn.trim();
+    const descriptionArValue = form.descriptionAr.trim();
 
     if (!Number.isFinite(sessions) || sessions <= 0) {
       toast.error(dictionary.feedback.errorGeneric);
@@ -556,8 +595,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topicId,
-          name: form.name.trim(),
-          description: form.description.trim() || undefined,
+          nameEn: form.nameEn.trim(),
+          nameAr: form.nameAr.trim(),
+          descriptionEn: descriptionEnValue ? descriptionEnValue : null,
+          descriptionAr: descriptionArValue ? descriptionArValue : null,
           sessionsRequired: sessions,
           estimatedHours: hours,
           order,
@@ -569,8 +610,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       const data = (await response.json()) as {
         topic: {
           id: string;
-          name: string;
-          description: string | null;
+          nameEn: string;
+          nameAr: string;
+          descriptionEn: string | null;
+          descriptionAr: string | null;
           sessionsRequired: number | string;
           estimatedHours: number | string;
           order: number | string;
@@ -579,8 +622,11 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
       };
       const topic = {
         id: data.topic.id,
-        name: data.topic.name,
-        description: data.topic.description,
+        name: { en: data.topic.nameEn, ar: data.topic.nameAr },
+        description:
+          data.topic.descriptionEn || data.topic.descriptionAr
+            ? { en: data.topic.descriptionEn ?? "", ar: data.topic.descriptionAr ?? "" }
+            : null,
         sessionsRequired: Number(data.topic.sessionsRequired),
         estimatedHours: Number(data.topic.estimatedHours),
         order: Number(data.topic.order),
@@ -738,11 +784,19 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="category">{dictionary.forms.categoryLabel}</Label>
+                  <Label htmlFor="categoryEn">{dictionary.forms.categoryEnLabel}</Label>
                   <Input
-                    id="category"
-                    value={courseForm.category}
-                    onChange={(event) => setCourseForm((previous) => ({ ...previous, category: event.target.value }))}
+                    id="categoryEn"
+                    value={courseForm.categoryEn}
+                    onChange={(event) => setCourseForm((previous) => ({ ...previous, categoryEn: event.target.value }))}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="categoryAr">{dictionary.forms.categoryArLabel}</Label>
+                  <Input
+                    id="categoryAr"
+                    value={courseForm.categoryAr}
+                    onChange={(event) => setCourseForm((previous) => ({ ...previous, categoryAr: event.target.value }))}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -840,7 +894,7 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                         {dictionary.courseMeta.type}: {dictionary.forms.typeOptions[course.type]}
                       </span>
                       <span className="rounded-full bg-brand-100 px-3 py-1">
-                        {dictionary.courseMeta.category}: {course.category}
+                        {dictionary.courseMeta.category}: {getLocalized(course.category, locale)}
                       </span>
                     </div>
                   </CardHeader>
@@ -973,14 +1027,27 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="editCategory">{dictionary.forms.categoryLabel}</Label>
+                  <Label htmlFor="editCategoryEn">{dictionary.forms.categoryEnLabel}</Label>
                   <Input
-                    id="editCategory"
-                    value={editForm.category}
+                    id="editCategoryEn"
+                    value={editForm.categoryEn}
                     onChange={(event) =>
                       setCourseEditForm((previous) => ({
                         ...previous,
-                        [activeCourse.id]: { ...previous[activeCourse.id], category: event.target.value },
+                        [activeCourse.id]: { ...previous[activeCourse.id], categoryEn: event.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="editCategoryAr">{dictionary.forms.categoryArLabel}</Label>
+                  <Input
+                    id="editCategoryAr"
+                    value={editForm.categoryAr}
+                    onChange={(event) =>
+                      setCourseEditForm((previous) => ({
+                        ...previous,
+                        [activeCourse.id]: { ...previous[activeCourse.id], categoryAr: event.target.value },
                       }))
                     }
                   />
@@ -1035,7 +1102,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                       {dictionary.courseDetail.typeLabel}: {dictionary.forms.typeOptions[activeCourse.type]}
                     </p>
                     <p>
-                      {dictionary.courseDetail.categoryLabel}: {activeCourse.category}
+                      {dictionary.courseDetail.categoryLabelEn}: {activeCourse.category.en}
+                    </p>
+                    <p>
+                      {dictionary.courseDetail.categoryLabelAr}: {activeCourse.category.ar}
                     </p>
                   </div>
                 </div>
@@ -1081,9 +1151,14 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                   className="flex flex-col gap-3 rounded-2xl border border-brand-100 bg-white/90 p-4 md:flex-row md:items-center md:justify-between"
                 >
                   <div className="space-y-1">
-                    <p className="font-semibold text-brand-700">
-                      {dictionary.difficulty.labels[difficulty.label] ?? difficulty.label}
-                    </p>
+                    <div>
+                      <p className="font-semibold text-brand-700">
+                        {getLocalized(difficulty.name, locale)}
+                      </p>
+                      <p className="text-xs text-brand-500">
+                        {locale === "ar" ? difficulty.name.en : difficulty.name.ar}
+                      </p>
+                    </div>
                     <p className="text-sm text-brand-500">
                       {formatCurrency(locale, difficulty.pricePerSession)} · {dictionary.table.perSession}
                     </p>
@@ -1134,9 +1209,14 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                     className="flex flex-col gap-4 rounded-2xl border border-brand-100 bg-white/90 p-4 md:flex-row md:items-center md:justify-between"
                   >
                     <div className="space-y-1">
-                      <p className="font-semibold text-brand-700">
-                        {dictionary.difficulty.labels[difficulty.label] ?? difficulty.label}
-                      </p>
+                      <div>
+                        <p className="font-semibold text-brand-700">
+                          {getLocalized(difficulty.name, locale)}
+                        </p>
+                        <p className="text-xs text-brand-500">
+                          {locale === "ar" ? difficulty.name.en : difficulty.name.ar}
+                        </p>
+                      </div>
                       <p className="text-sm text-brand-500">
                         {formatCurrency(locale, difficulty.pricePerSession)} · {dictionary.table.perSession}
                       </p>
@@ -1184,24 +1264,30 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
               <h3 className="font-semibold text-brand-700">{dictionary.difficulty.addTitle}</h3>
               <div className="grid gap-3">
                 <div className="grid gap-2">
-                  <Label>{dictionary.difficulty.labelPlaceholder}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(dictionary.difficulty.labels).map(([value, label]) => (
-                      <Button
-                        key={value}
-                        type="button"
-                        variant={draft.label === value ? "default" : "outline"}
-                        onClick={() =>
-                          setDifficultyDrafts((previous) => ({
-                            ...previous,
-                            [activeCourse.id]: { ...(previous[activeCourse.id] ?? DEFAULT_DIFFICULTY_DRAFT), label: value as DifficultyDraft["label"] },
-                          }))
-                        }
-                      >
-                        {label}
-                      </Button>
-                    ))}
-                  </div>
+                  <Label htmlFor="difficultyNameEn">{dictionary.difficulty.nameEnPlaceholder}</Label>
+                  <Input
+                    id="difficultyNameEn"
+                    value={draft.nameEn}
+                    onChange={(event) =>
+                      setDifficultyDrafts((previous) => ({
+                        ...previous,
+                        [activeCourse.id]: { ...(previous[activeCourse.id] ?? DEFAULT_DIFFICULTY_DRAFT), nameEn: event.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="difficultyNameAr">{dictionary.difficulty.nameArPlaceholder}</Label>
+                  <Input
+                    id="difficultyNameAr"
+                    value={draft.nameAr}
+                    onChange={(event) =>
+                      setDifficultyDrafts((previous) => ({
+                        ...previous,
+                        [activeCourse.id]: { ...(previous[activeCourse.id] ?? DEFAULT_DIFFICULTY_DRAFT), nameAr: event.target.value },
+                      }))
+                    }
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="difficultyPrice">{dictionary.difficulty.priceLabel}</Label>
@@ -1251,7 +1337,10 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
           <div className="space-y-3">
             <h2 className="font-display text-2xl text-brand-800">{dictionary.topics.title}</h2>
             <p className="text-sm text-brand-600">
-              {dictionary.difficulty.labels[activeDifficulty.label] ?? activeDifficulty.label} · {formatCurrency(locale, activeDifficulty.pricePerSession)}
+              {getLocalized(activeDifficulty.name, locale)} · {formatCurrency(locale, activeDifficulty.pricePerSession)}
+            </p>
+            <p className="text-xs text-brand-500">
+              {locale === "ar" ? activeDifficulty.name.en : activeDifficulty.name.ar}
             </p>
           </div>
 
@@ -1295,20 +1384,36 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
             >
               <h3 className="font-semibold text-brand-700">{dictionary.topics.formTitle}</h3>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="grid gap-2 md:col-span-2">
-                  <Label htmlFor="topicName">{dictionary.topics.nameLabel}</Label>
+                <div className="grid gap-2">
+                  <Label htmlFor="topicNameEn">{dictionary.topics.nameEnLabel}</Label>
                   <Input
-                    id="topicName"
-                    value={topicForm.name}
-                    onChange={(event) => setTopicForm((previous) => ({ ...previous, name: event.target.value }))}
+                    id="topicNameEn"
+                    value={topicForm.nameEn}
+                    onChange={(event) => setTopicForm((previous) => ({ ...previous, nameEn: event.target.value }))}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="topicNameAr">{dictionary.topics.nameArLabel}</Label>
+                  <Input
+                    id="topicNameAr"
+                    value={topicForm.nameAr}
+                    onChange={(event) => setTopicForm((previous) => ({ ...previous, nameAr: event.target.value }))}
                   />
                 </div>
                 <div className="grid gap-2 md:col-span-2">
-                  <Label htmlFor="topicDescription">{dictionary.topics.descriptionLabel}</Label>
+                  <Label htmlFor="topicDescriptionEn">{dictionary.topics.descriptionEnLabel}</Label>
                   <Textarea
-                    id="topicDescription"
-                    value={topicForm.description}
-                    onChange={(event) => setTopicForm((previous) => ({ ...previous, description: event.target.value }))}
+                    id="topicDescriptionEn"
+                    value={topicForm.descriptionEn}
+                    onChange={(event) => setTopicForm((previous) => ({ ...previous, descriptionEn: event.target.value }))}
+                  />
+                </div>
+                <div className="grid gap-2 md:col-span-2">
+                  <Label htmlFor="topicDescriptionAr">{dictionary.topics.descriptionArLabel}</Label>
+                  <Textarea
+                    id="topicDescriptionAr"
+                    value={topicForm.descriptionAr}
+                    onChange={(event) => setTopicForm((previous) => ({ ...previous, descriptionAr: event.target.value }))}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -1373,10 +1478,20 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                 const state = isEditing ? topicFormState ?? topicEdits[topic.id] : null;
                 return (
                   <div key={topic.id} className="space-y-3 rounded-2xl border border-brand-100 bg-white/90 p-4">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <p className="font-semibold text-brand-800">{topic.name}</p>
-                        <p className="text-sm text-brand-600">{topic.description}</p>
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <div>
+                          <p className="font-semibold text-brand-800">{topic.name.en}</p>
+                          {topic.description?.en && (
+                            <p className="text-sm text-brand-600">{topic.description.en}</p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-brand-800">{topic.name.ar}</p>
+                          {topic.description?.ar && (
+                            <p className="text-sm text-brand-600">{topic.description.ar}</p>
+                          )}
+                        </div>
                       </div>
                       <div className="flex flex-wrap gap-2 text-xs text-brand-500">
                         <span>
@@ -1419,26 +1534,50 @@ export function CatalogManager({ initialCourses, dictionary, locale }: CatalogMa
                         }}
                       >
                         <div className="grid gap-2 md:grid-cols-2">
-                          <div className="grid gap-2 md:col-span-2">
-                            <Label>{dictionary.topics.nameLabel}</Label>
+                          <div className="grid gap-2">
+                            <Label>{dictionary.topics.nameEnLabel}</Label>
                             <Input
-                              value={state.name}
+                              value={state.nameEn}
                               onChange={(event) =>
                                 setTopicEdits((previous) => ({
                                   ...previous,
-                                  [topic.id]: { ...previous[topic.id], name: event.target.value },
+                                  [topic.id]: { ...previous[topic.id], nameEn: event.target.value },
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label>{dictionary.topics.nameArLabel}</Label>
+                            <Input
+                              value={state.nameAr}
+                              onChange={(event) =>
+                                setTopicEdits((previous) => ({
+                                  ...previous,
+                                  [topic.id]: { ...previous[topic.id], nameAr: event.target.value },
                                 }))
                               }
                             />
                           </div>
                           <div className="grid gap-2 md:col-span-2">
-                            <Label>{dictionary.topics.descriptionLabel}</Label>
+                            <Label>{dictionary.topics.descriptionEnLabel}</Label>
                             <Textarea
-                              value={state.description}
+                              value={state.descriptionEn}
                               onChange={(event) =>
                                 setTopicEdits((previous) => ({
                                   ...previous,
-                                  [topic.id]: { ...previous[topic.id], description: event.target.value },
+                                  [topic.id]: { ...previous[topic.id], descriptionEn: event.target.value },
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="grid gap-2 md:col-span-2">
+                            <Label>{dictionary.topics.descriptionArLabel}</Label>
+                            <Textarea
+                              value={state.descriptionAr}
+                              onChange={(event) =>
+                                setTopicEdits((previous) => ({
+                                  ...previous,
+                                  [topic.id]: { ...previous[topic.id], descriptionAr: event.target.value },
                                 }))
                               }
                             />

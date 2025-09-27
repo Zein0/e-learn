@@ -378,7 +378,7 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                       className="h-auto rounded-3xl px-5 py-4 text-left"
                     >
                       <span className="block text-sm font-semibold uppercase tracking-wide">
-                        {difficulty.label}
+                        {difficulty.name}
                       </span>
                       <span
                         className={`mt-1 block text-xs ${

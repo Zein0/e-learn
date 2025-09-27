@@ -24,10 +24,10 @@ export default async function AdminCatalogPage() {
       title: { en: course.titleEn, ar: course.titleAr },
       description: { en: course.descriptionEn, ar: course.descriptionAr },
       type: course.type,
-      category: course.category,
+      category: { en: course.categoryEn, ar: course.categoryAr },
       difficulties: course.difficulties.map((difficulty) => ({
         id: difficulty.id,
-        label: difficulty.label,
+        name: { en: difficulty.nameEn, ar: difficulty.nameAr },
         pricePerSession: Number(difficulty.pricePerSession),
       })),
       topics: course.topics
@@ -35,8 +35,11 @@ export default async function AdminCatalogPage() {
         .sort((a, b) => a.order - b.order)
         .map((topic) => ({
           id: topic.id,
-          name: topic.name,
-          description: topic.description,
+          name: { en: topic.nameEn, ar: topic.nameAr },
+          description:
+            topic.descriptionEn || topic.descriptionAr
+              ? { en: topic.descriptionEn ?? "", ar: topic.descriptionAr ?? "" }
+              : null,
           sessionsRequired: topic.sessionsRequired,
           estimatedHours: topic.estimatedHours,
           order: topic.order,

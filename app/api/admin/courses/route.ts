@@ -37,14 +37,16 @@ type CoursePayload = {
   descriptionEn?: string;
   descriptionAr?: string;
   type?: string;
-  category?: string;
+  categoryEn?: string;
+  categoryAr?: string;
 };
 
 export async function POST(request: Request) {
   try {
     await requireAdmin();
-    const { titleEn, titleAr, descriptionEn, descriptionAr, type, category } = (await request.json()) as CoursePayload;
-    if (!titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !category) {
+    const { titleEn, titleAr, descriptionEn, descriptionAr, type, categoryEn, categoryAr } =
+      (await request.json()) as CoursePayload;
+    if (!titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !categoryEn || !categoryAr) {
       return NextResponse.json({ error: "بيانات غير مكتملة" }, { status: 400 });
     }
     const course = await prisma.course.create({
@@ -54,7 +56,8 @@ export async function POST(request: Request) {
         descriptionEn,
         descriptionAr,
         type: type as "PRIVATE" | "CLASSROOM",
-        category,
+        categoryEn,
+        categoryAr,
       },
     });
     return NextResponse.json({ course });
@@ -72,9 +75,9 @@ type CourseUpdatePayload = CoursePayload & { id?: string };
 export async function PATCH(request: Request) {
   try {
     await requireAdmin();
-    const { id, titleEn, titleAr, descriptionEn, descriptionAr, type, category } =
+    const { id, titleEn, titleAr, descriptionEn, descriptionAr, type, categoryEn, categoryAr } =
       (await request.json()) as CourseUpdatePayload;
-    if (!id || !titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !category) {
+    if (!id || !titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !categoryEn || !categoryAr) {
       return NextResponse.json({ error: "معرّف غير موجود" }, { status: 400 });
     }
     const course = await prisma.course.update({
@@ -85,7 +88,8 @@ export async function PATCH(request: Request) {
         descriptionEn,
         descriptionAr,
         type: type as "PRIVATE" | "CLASSROOM",
-        category,
+        categoryEn,
+        categoryAr,
       },
     });
     return NextResponse.json({ course });

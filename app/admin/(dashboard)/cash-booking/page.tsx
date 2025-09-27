@@ -21,12 +21,12 @@ export default async function AdminCashBookingPage() {
       title: locale === "ar" ? course.titleAr : course.titleEn,
       difficulties: course.difficulties.map((difficulty) => ({
         id: difficulty.id,
-        label: difficulty.label,
+        name: locale === "ar" ? difficulty.nameAr : difficulty.nameEn,
         pricePerSession: Number(difficulty.pricePerSession),
       })),
       topics: course.topics.map((topic) => ({
         id: topic.id,
-        name: topic.name,
+        name: locale === "ar" ? topic.nameAr : topic.nameEn,
         sessionsRequired: topic.sessionsRequired,
         difficultyId: topic.difficultyId,
       })),

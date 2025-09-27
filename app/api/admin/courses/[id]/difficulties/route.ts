@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Prisma, type DifficultyLabel } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -12,7 +12,8 @@ async function ensureAdmin() {
 }
 
 type DifficultyPayload = {
-  label?: DifficultyLabel;
+  nameEn?: string;
+  nameAr?: string;
   pricePerSession?: number;
 };
 
@@ -25,10 +26,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
     await ensureAdmin();
     const courseId = params.id;
     const payload = (await request.json()) as DifficultyPayload;
-    const { label, pricePerSession } = payload;
+    const { nameEn, nameAr, pricePerSession } = payload;
     const parsedPrice = typeof pricePerSession === "string" ? Number(pricePerSession) : pricePerSession;
 
-    if (!courseId || !label || parsedPrice === undefined) {
+    if (!courseId || !nameEn || !nameAr || parsedPrice === undefined) {
       return NextResponse.json({ error: "بيانات غير مكتملة" }, { status: 400 });
     }
 
@@ -39,7 +40,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const difficulty = await prisma.courseDifficulty.create({
       data: {
         courseId,
-        label,
+        nameEn,
+        nameAr,
         pricePerSession: new Prisma.Decimal(parsedPrice),
       },
     });
@@ -58,7 +60,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   try {
     await ensureAdmin();
     const { id: courseId } = params;
-    const { difficultyId, label, pricePerSession } = (await request.json()) as DifficultyPatchPayload;
+    const { difficultyId, nameEn, nameAr, pricePerSession } = (await request.json()) as DifficultyPatchPayload;
     const parsedPrice = typeof pricePerSession === "string" ? Number(pricePerSession) : pricePerSession;
 
     if (!courseId || !difficultyId) {
@@ -71,8 +73,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     const data: Prisma.CourseDifficultyUpdateInput = {};
-    if (label) {
-      data.label = label;
+    if (nameEn) {
+      data.nameEn = nameEn;
+    }
+    if (nameAr) {
+      data.nameAr = nameAr;
     }
     if (parsedPrice !== undefined) {
       if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
