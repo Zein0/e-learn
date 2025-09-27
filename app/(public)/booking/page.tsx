@@ -26,12 +26,12 @@ export default async function BookingPage() {
           orderBy: { order: "asc" },
         },
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
     courses = records.map((course) => ({
       id: course.id,
-      title: course.title,
-      description: course.description,
+      title: locale === "ar" ? course.titleAr : course.titleEn,
+      description: locale === "ar" ? course.descriptionAr : course.descriptionEn,
       type: course.type,
       category: course.category,
       difficulties: course.difficulties.map((difficulty) => ({

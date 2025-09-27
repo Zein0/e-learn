@@ -28,7 +28,7 @@ export default async function CoursesPage() {
           orderBy: { order: "asc" },
         },
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
   } catch (error) {
     console.error("Failed to load courses", error);
@@ -56,12 +56,15 @@ export default async function CoursesPage() {
           </Card>
         )}
 
-        {courses.map((course) => (
+        {courses.map((course) => {
+          const title = locale === "ar" ? course.titleAr : course.titleEn;
+          const description = locale === "ar" ? course.descriptionAr : course.descriptionEn;
+          return (
           <Card key={course.id} className="flex flex-col justify-between">
             <div className="space-y-4">
               <CardHeader className="space-y-2">
-                <CardTitle className="text-2xl">{course.title}</CardTitle>
-                <CardDescription>{course.description}</CardDescription>
+                <CardTitle className="text-2xl">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
                 <div className="flex flex-wrap gap-2 text-xs font-semibold text-emerald-600">
                   <span className="rounded-full bg-emerald-500/10 px-3 py-1">{course.type}</span>
                   <span className="rounded-full bg-brand-500/10 px-3 py-1">{course.category}</span>
@@ -100,7 +103,8 @@ export default async function CoursesPage() {
               </Button>
             </div>
           </Card>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

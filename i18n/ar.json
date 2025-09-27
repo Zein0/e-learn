@@ -249,17 +249,31 @@
     "catalog": {
       "title": "إدارة المحتوى التعليمي",
       "description": "تحكم بالدورات، المستويات، والموضوعات من مكان واحد.",
-      "createCourse": {
-        "title": "إضافة دورة جديدة",
-        "nameLabel": "اسم الدورة",
-        "descriptionLabel": "وصف الدورة",
+      "list": {
+        "searchPlaceholder": "ابحث عن الدورات بالاسم الإنجليزي",
+        "addAction": "إضافة دورة",
+        "emptyTitle": "لا توجد دورات بعد",
+        "emptyDescription": "ابدأ بإضافة دورة جديدة لنشر المسارات التعليمية.",
+        "pageLabel": "الصفحة {{current}} من {{total}}",
+        "viewAction": "عرض التفاصيل"
+      },
+      "forms": {
+        "nameEnLabel": "اسم الدورة (بالإنجليزية)",
+        "nameArLabel": "اسم الدورة (بالعربية)",
+        "descriptionEnLabel": "الوصف (بالإنجليزية)",
+        "descriptionArLabel": "الوصف (بالعربية)",
         "categoryLabel": "التصنيف",
         "typeLabel": "نوع الدورة",
         "typeOptions": {
           "PRIVATE": "خاصة",
           "CLASSROOM": "صفية"
         },
-        "submit": "حفظ الدورة"
+        "submit": "حفظ الدورة",
+        "cancel": "إلغاء"
+      },
+      "createCourse": {
+        "title": "إضافة دورة جديدة",
+        "description": "أدخل التفاصيل باللغتين قبل نشر الدورة."
       },
       "updateCourse": {
         "editAction": "تعديل",
@@ -270,25 +284,49 @@
         "type": "نوع الدورة",
         "category": "التصنيف"
       },
+      "courseDetail": {
+        "backToList": "العودة إلى المحتوى",
+        "overviewTitle": "نظرة عامة على الدورة",
+        "englishHeading": "المحتوى الإنجليزي",
+        "arabicHeading": "المحتوى العربي",
+        "descriptionHeading": "الوصف",
+        "metadataTitle": "معلومات الدورة",
+        "typeLabel": "النوع",
+        "categoryLabel": "التصنيف",
+        "summaryTitle": "ملخص المستويات",
+        "summaryDescription": "راجع الأسعار وعدد الموضوعات لكل مستوى.",
+        "difficultiesCountLabel": "{{count}} مستوى",
+        "topicsCountLabel": "{{count}} موضوع",
+        "manageDifficulties": "إدارة المستويات",
+        "editAction": "تعديل الدورة",
+        "saveAction": "حفظ التغييرات",
+        "cancelAction": "إلغاء"
+      },
       "difficulty": {
         "title": "المستويات",
-        "existingTitle": "المستويات النشطة مع سعر الجلسة.",
+        "description": "أنشئ مستويات خاصة بالدورة وحدّث أسعار الجلسات بالدولار.",
+        "existingTitle": "المستويات الحالية",
         "priceLabel": "سعر الجلسة (دولار)",
         "addTitle": "إضافة مستوى جديد",
         "labelPlaceholder": "اختر المستوى",
         "pricePlaceholder": "مثال: 25",
-        "submit": "إضافة المستوى",
+        "submit": "حفظ المستوى",
         "labels": {
           "BEGINNER": "مبتدئ",
           "INTERMEDIATE": "متوسط",
           "ADVANCED": "متقدم"
-        }
+        },
+        "backToCourse": "العودة إلى الدورة",
+        "manageTopics": "إدارة الموضوعات",
+        "empty": "لم تتم إضافة مستويات بعد.",
+        "pageLabel": "عرض {{from}}-{{to}} من أصل {{total}} مستوى"
       },
       "topics": {
         "title": "الموضوعات",
         "empty": "لم تتم إضافة موضوعات بعد.",
         "addButton": "إضافة موضوع",
         "formTitle": "موضوع جديد",
+        "editTitle": "تعديل الموضوع",
         "nameLabel": "اسم الموضوع",
         "descriptionLabel": "الوصف",
         "sessionsLabel": "عدد الجلسات",
@@ -298,7 +336,9 @@
         "cancel": "إلغاء",
         "editAction": "تعديل",
         "moveUp": "للأعلى",
-        "moveDown": "للأسفل"
+        "moveDown": "للأسفل",
+        "backToDifficulties": "العودة إلى المستويات",
+        "pageLabel": "الصفحة {{current}} من {{total}}"
       },
       "feedback": {
         "courseCreated": "تم إنشاء الدورة",

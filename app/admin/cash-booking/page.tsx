@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/db";
+import { getLocale } from "@/lib/i18n";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CashBookingForm, type CashBookingCourse } from "@/components/admin/cash-booking-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCashBookingPage() {
+  const locale = await getLocale();
   let courses: CashBookingCourse[] = [];
   try {
     const records = await prisma.course.findMany({
@@ -12,11 +14,11 @@ export default async function AdminCashBookingPage() {
         difficulties: true,
         topics: { orderBy: { order: "asc" } },
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
     courses = records.map((course) => ({
       id: course.id,
-      title: course.title,
+      title: locale === "ar" ? course.titleAr : course.titleEn,
       difficulties: course.difficulties.map((difficulty) => ({
         id: difficulty.id,
         label: difficulty.label,

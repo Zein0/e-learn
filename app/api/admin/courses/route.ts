@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -19,7 +19,7 @@ export async function GET() {
         difficulties: true,
         topics: true,
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
     return NextResponse.json({ courses });
   } catch (error) {
@@ -31,16 +31,31 @@ export async function GET() {
   }
 }
 
+type CoursePayload = {
+  titleEn?: string;
+  titleAr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  type?: string;
+  category?: string;
+};
+
 export async function POST(request: Request) {
   try {
     await requireAdmin();
-    const payload = (await request.json()) as Prisma.CourseCreateInput;
-    const { title, description, type, category } = payload;
-    if (!title || !description || !type || !category) {
+    const { titleEn, titleAr, descriptionEn, descriptionAr, type, category } = (await request.json()) as CoursePayload;
+    if (!titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !category) {
       return NextResponse.json({ error: "بيانات غير مكتملة" }, { status: 400 });
     }
     const course = await prisma.course.create({
-      data: { title, description, type, category },
+      data: {
+        titleEn,
+        titleAr,
+        descriptionEn,
+        descriptionAr,
+        type: type as "PRIVATE" | "CLASSROOM",
+        category,
+      },
     });
     return NextResponse.json({ course });
   } catch (error) {
@@ -52,16 +67,26 @@ export async function POST(request: Request) {
   }
 }
 
+type CourseUpdatePayload = CoursePayload & { id?: string };
+
 export async function PATCH(request: Request) {
   try {
     await requireAdmin();
-    const { id, ...data } = (await request.json()) as { id?: string } & Prisma.CourseUpdateInput;
-    if (!id) {
+    const { id, titleEn, titleAr, descriptionEn, descriptionAr, type, category } =
+      (await request.json()) as CourseUpdatePayload;
+    if (!id || !titleEn || !titleAr || !descriptionEn || !descriptionAr || !type || !category) {
       return NextResponse.json({ error: "معرّف غير موجود" }, { status: 400 });
     }
     const course = await prisma.course.update({
       where: { id },
-      data,
+      data: {
+        titleEn,
+        titleAr,
+        descriptionEn,
+        descriptionAr,
+        type: type as "PRIVATE" | "CLASSROOM",
+        category,
+      },
     });
     return NextResponse.json({ course });
   } catch (error) {

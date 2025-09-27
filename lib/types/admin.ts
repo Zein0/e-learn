@@ -1,9 +1,14 @@
 import type { CourseType, DifficultyLabel } from "@prisma/client";
 
+export type TranslatedField = {
+  en: string;
+  ar: string;
+};
+
 export type AdminCatalogCourse = {
   id: string;
-  title: string;
-  description: string;
+  title: TranslatedField;
+  description: TranslatedField;
   type: CourseType;
   category: string;
   difficulties: {
@@ -25,14 +30,28 @@ export type AdminCatalogCourse = {
 export type AdminCatalogDictionary = {
   title: string;
   description: string;
-  createCourse: {
-    title: string;
-    nameLabel: string;
-    descriptionLabel: string;
+  list: {
+    searchPlaceholder: string;
+    addAction: string;
+    emptyTitle: string;
+    emptyDescription: string;
+    pageLabel: string;
+    viewAction: string;
+  };
+  forms: {
+    nameEnLabel: string;
+    nameArLabel: string;
+    descriptionEnLabel: string;
+    descriptionArLabel: string;
     categoryLabel: string;
     typeLabel: string;
     typeOptions: Record<CourseType, string>;
     submit: string;
+    cancel: string;
+  };
+  createCourse: {
+    title: string;
+    description: string;
   };
   updateCourse: {
     editAction: string;
@@ -43,8 +62,27 @@ export type AdminCatalogDictionary = {
     type: string;
     category: string;
   };
+  courseDetail: {
+    backToList: string;
+    overviewTitle: string;
+    englishHeading: string;
+    arabicHeading: string;
+    descriptionHeading: string;
+    metadataTitle: string;
+    typeLabel: string;
+    categoryLabel: string;
+    summaryTitle: string;
+    summaryDescription: string;
+    difficultiesCountLabel: string;
+    topicsCountLabel: string;
+    manageDifficulties: string;
+    editAction: string;
+    saveAction: string;
+    cancelAction: string;
+  };
   difficulty: {
     title: string;
+    description: string;
     existingTitle: string;
     priceLabel: string;
     addTitle: string;
@@ -52,12 +90,17 @@ export type AdminCatalogDictionary = {
     pricePlaceholder: string;
     submit: string;
     labels: Record<DifficultyLabel, string>;
+    backToCourse: string;
+    manageTopics: string;
+    empty: string;
+    pageLabel: string;
   };
   topics: {
     title: string;
     empty: string;
     addButton: string;
     formTitle: string;
+    editTitle: string;
     nameLabel: string;
     descriptionLabel: string;
     sessionsLabel: string;
@@ -68,6 +111,8 @@ export type AdminCatalogDictionary = {
     editAction: string;
     moveUp: string;
     moveDown: string;
+    backToDifficulties: string;
+    pageLabel: string;
   };
   feedback: {
     courseCreated: string;
