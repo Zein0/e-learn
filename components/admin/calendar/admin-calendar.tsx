@@ -77,16 +77,15 @@ export function AdminCalendar({ appointments, locale, dictionary }: AdminCalenda
   const monthDays = useMemo(() => {
     const monthStart = startOfMonth(anchorDate);
     const monthEnd = endOfMonth(anchorDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: WEEK_STARTS_ON });
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: WEEK_STARTS_ON });
-    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd }).map((day) => ({
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd }).map((day) => ({
       day,
       entries: appointments.filter((appointment) => {
         const date = new Date(appointment.startAt);
         return date >= startOfDay(day) && date <= endOfDay(day);
       }),
     }));
-    return { calendarStart, calendarEnd, days };
+    const firstDayColumn = ((monthStart.getDay() - WEEK_STARTS_ON + 7) % 7) + 1;
+    return { monthStart, monthEnd, days, firstDayColumn };
   }, [anchorDate, appointments]);
 
   const handlePrevious = () => {
@@ -166,10 +165,17 @@ export function AdminCalendar({ appointments, locale, dictionary }: AdminCalenda
       ) : (
         <div className="rounded-3xl border border-brand-100 bg-white/90 p-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {monthDays.days.map(({ day, entries }) => (
+            {monthDays.days.map(({ day, entries }, index) => (
               <div
                 key={day.toISOString()}
                 className="min-h-[120px] rounded-2xl border border-brand-100 bg-white p-3 shadow-sm"
+                style={
+                  index === 0
+                    ? {
+                        gridColumnStart: monthDays.firstDayColumn,
+                      }
+                    : undefined
+                }
               >
                 <div className="flex items-center justify-between text-xs text-brand-500">
                   <span>{format(day, "d")}</span>
