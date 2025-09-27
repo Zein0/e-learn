@@ -53,15 +53,7 @@ export async function POST(request: Request) {
 
     const sessionsTotal = topics.reduce((sum, topic) => sum + topic.sessionsRequired, 0);
     const pricing = calculatePricing({ sessionsTotal, difficulty, discountRules, coupon });
-    const slot = await validateSlot({ userId: user.id, startAt: slotStartAt });
-
-    const appointmentsPayload = Array.from({ length: sessionsTotal }).map((_, index) => {
-      const start = new Date(slot.startAt.getTime() + index * 60 * 60 * 1000);
-      return {
-        startAt: start,
-        endAt: new Date(start.getTime() + 60 * 60 * 1000),
-      };
-    });
+    const { occurrences } = await validateSlot({ startAt: slotStartAt, sessions: sessionsTotal });
 
     const placement = placementChoice ?? "KNOWN_LEVEL";
 
@@ -94,7 +86,7 @@ export async function POST(request: Request) {
       }
 
       const appointments = await Promise.all(
-        appointmentsPayload.map((payload) =>
+        occurrences.map((payload) =>
           tx.appointment.create({
             data: {
               bookingId: booking.id,

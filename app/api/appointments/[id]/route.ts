@@ -53,12 +53,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         if (!newStartAt) {
           return NextResponse.json({ error: "يجب تحديد موعد جديد" }, { status: 400 });
         }
-        const slot = await validateSlot({ userId: appointment.userId, startAt: newStartAt });
+        const { occurrences } = await validateSlot({
+          startAt: newStartAt,
+          ignoreAppointmentId: appointment.id,
+        });
         const updated = await prisma.appointment.update({
           where: { id: appointment.id },
           data: {
-            startAt: slot.startAt,
-            endAt: slot.endAt,
+            startAt: occurrences[0].startAt,
+            endAt: occurrences[0].endAt,
             status: "RESCHEDULED",
           },
         });

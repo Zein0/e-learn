@@ -55,9 +55,17 @@ export type BookingDictionary = {
       placementQuestion: string;
       levelLabel: string;
       levelPlaceholder: string;
-      slotLabel: string;
       notesLabel: string;
       notesPlaceholder: string;
+      availability: {
+        title: string;
+        description: string;
+        loading: string;
+        empty: string;
+        timezone: string;
+        selected: string;
+        sessionsNote: string;
+      };
     };
     summary: {
       title: string;

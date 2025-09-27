@@ -1,6 +1,8 @@
 const DEFAULT_TZ = process.env.TIMEZONE_DISPLAY ?? "Asia/Beirut";
 const DEFAULT_LOCALE = process.env.APP_LOCALE_DEFAULT ?? "ar";
 
+export const SYSTEM_TIMEZONE = DEFAULT_TZ;
+
 type FormatVariant = "datetime" | "time";
 
 type FormatOptions = {

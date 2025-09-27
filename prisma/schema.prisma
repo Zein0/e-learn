@@ -189,3 +189,15 @@ model AdminCashReceipt {
   handledByAdminId String
   createdAt        DateTime @default(now())
 }
+
+model AvailabilitySlot {
+  id              String   @id @default(uuid())
+  dayOfWeek       Int
+  startMinutes    Int
+  durationMinutes Int      @default(60)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([dayOfWeek, startMinutes])
+}

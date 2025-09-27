@@ -18,6 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/appointments", label: dictionary.admin.nav.appointments },
     { href: "/admin/calendar", label: dictionary.admin.nav.calendar },
     { href: "/admin/catalog", label: dictionary.admin.nav.catalog },
+    { href: "/admin/availability", label: dictionary.admin.nav.availability },
     { href: "/admin/reports", label: dictionary.admin.nav.reports },
     { href: "/admin/cash-booking", label: dictionary.admin.nav.cashBooking },
     { href: "/admin/users", label: dictionary.admin.nav.users },
