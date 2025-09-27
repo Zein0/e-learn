@@ -46,7 +46,7 @@ export async function Navbar() {
               english: dict.common.languageEnglish,
             }}
           />
-          <ThemeToggle dir={dir} labels={{ light: dict.common.lightMode, dark: dict.common.darkMode }} />
+          {/* <ThemeToggle dir={dir} labels={{ light: dict.common.lightMode, dark: dict.common.darkMode }} /> */}
           <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
             <Link href="/login">{dict.common.login}</Link>
           </Button>
