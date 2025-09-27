@@ -33,9 +33,13 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
 );
 CardDescription.displayName = "CardDescription";
 
-const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("space-y-4", className)} {...props} />
+interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  disableSpace?: boolean;
+}
+
+const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, disableSpace, ...props }, ref) => (
+    <div ref={ref} className={cn(!disableSpace && "space-y-4", className)}  {...props} />
   ),
 );
 CardContent.displayName = "CardContent";

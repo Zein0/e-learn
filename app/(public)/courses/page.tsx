@@ -34,6 +34,7 @@ export default async function CoursesPage() {
     console.error("Failed to load courses", error);
   }
 
+
   return (
     <section className="space-y-10">
       <div className="rounded-[36px] bg-white/80 p-8 shadow-soft ring-1 ring-brand-100">
@@ -59,6 +60,7 @@ export default async function CoursesPage() {
         {courses.map((course) => {
           const title = locale === "ar" ? course.titleAr : course.titleEn;
           const description = locale === "ar" ? course.descriptionAr : course.descriptionEn;
+          const category = locale === "ar" ? course.categoryAr : course.categoryEn;
           return (
           <Card key={course.id} className="flex flex-col justify-between">
             <div className="space-y-4">
@@ -67,7 +69,7 @@ export default async function CoursesPage() {
                 <CardDescription>{description}</CardDescription>
                 <div className="flex flex-wrap gap-2 text-xs font-semibold text-emerald-600">
                   <span className="rounded-full bg-emerald-500/10 px-3 py-1">{course.type}</span>
-                  <span className="rounded-full bg-brand-500/10 px-3 py-1">{course.category}</span>
+                  <span className="rounded-full bg-brand-500/10 px-3 py-1">{category}</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -80,7 +82,7 @@ export default async function CoursesPage() {
                         className="rounded-3xl border border-emerald-200/60 bg-emerald-50/80 px-4 py-3 text-emerald-700 shadow-sm"
                       >
                         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
-                          {difficulty.name}
+                          {locale === "ar" ? difficulty.nameAr : difficulty.nameEn}
                         </p>
                         <p className="mt-1 text-sm font-medium">
                           {Number(difficulty.pricePerSession).toLocaleString(locale, {
@@ -98,7 +100,7 @@ export default async function CoursesPage() {
               </CardContent>
             </div>
             <div className="px-6 pb-6">
-              <Button asChild className="w-full">
+              <Button asChild className="w-full mt-4">
                 <Link href={`/booking?courseId=${course.id}`}>{dict.common.getStarted}</Link>
               </Button>
             </div>

@@ -322,10 +322,12 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                   key={course.id}
                   type="button"
                   onClick={() => setField("courseId", course.id)}
-                  className={`rounded-3xl border p-4 text-right transition ${
+                  className={`rounded-3xl border p-4 transition ${
                     course.id === selectedCourse?.id
                       ? "border-emerald-500 bg-emerald-500/10 shadow-soft"
                       : "border-brand-100 bg-white hover:border-emerald-500"
+                  } ${
+                    locale === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   <p className="font-semibold text-brand-800">{course.title}</p>
@@ -341,7 +343,7 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
               <CardTitle>{dictionary.form.levelCheck.title}</CardTitle>
               <CardDescription>{dictionary.form.levelCheck.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
+            <CardContent className="flex flex-wrap gap-3" disableSpace>
               <Button
                 type="button"
                 variant={knowsLevel === true ? "default" : "outline"}
@@ -367,7 +369,7 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                 <CardTitle>{dictionary.form.difficulty.title}</CardTitle>
                 <CardDescription>{dictionary.form.difficulty.description}</CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-3 sm:grid-cols-3">
+              <CardContent className="grid gap-3 sm:grid-cols-3" disableSpace>
                 {difficulties.map((difficulty) => {
                   const isSelected = difficulty.id === selectedDifficulty?.id;
                   return (
