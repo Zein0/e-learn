@@ -2,6 +2,23 @@ import { cookies } from "next/headers";
 import { getFirebaseAdmin } from "./firebase-admin";
 import { prisma } from "./db";
 
+function getTokenIssuer(token: string) {
+  const parts = token.split(".");
+  if (parts.length < 2) {
+    return null;
+  }
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const payload = Buffer.from(padded, "base64").toString("utf8");
+    const decoded = JSON.parse(payload) as { iss?: unknown };
+    return typeof decoded.iss === "string" ? decoded.iss : null;
+  } catch (error) {
+    console.error("Failed to decode session token", error);
+    return null;
+  }
+}
+
 export type SessionUser = {
   id: string;
   role: "LEARNER" | "ADMIN";
@@ -15,7 +32,11 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   if (!token) return null;
   try {
     const auth = getFirebaseAdmin();
-    const decoded = await auth.verifyIdToken(token);
+    const issuer = getTokenIssuer(token);
+    const isSessionCookie = issuer?.includes("session.firebase.google.com");
+    const decoded = isSessionCookie
+      ? await auth.verifySessionCookie(token, true)
+      : await auth.verifyIdToken(token, true);
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
     });

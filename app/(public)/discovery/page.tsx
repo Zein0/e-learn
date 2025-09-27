@@ -53,7 +53,7 @@ export default async function DiscoveryPage() {
             </div>
             <div className="grid gap-2 text-sm text-brand-600">
               <Label htmlFor="time">{discovery.form.fields.time.label}</Label>
-              <Input id="time" type="datetime-local" name="time" />
+              <Input id="time" type="datetime-local" name="time" step={60} />
             </div>
             <Button className="w-full" size="lg">
               {discovery.form.submit}

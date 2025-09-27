@@ -222,6 +222,32 @@ async function main() {
   }
 
   console.info("✔️ Discount rules updated");
+
+  const availabilitySlots = [
+    { dayOfWeek: 1, startMinutes: 9 * 60 + 30, durationMinutes: 60 },
+    { dayOfWeek: 3, startMinutes: 11 * 60, durationMinutes: 45 },
+    { dayOfWeek: 4, startMinutes: 14 * 60 + 15, durationMinutes: 60 },
+    { dayOfWeek: 6, startMinutes: 10 * 60 + 45, durationMinutes: 60 },
+  ];
+
+  for (const slot of availabilitySlots) {
+    const existingSlot = await prisma.availabilitySlot.findFirst({
+      where: { dayOfWeek: slot.dayOfWeek, startMinutes: slot.startMinutes },
+    });
+
+    if (existingSlot) {
+      await prisma.availabilitySlot.update({
+        where: { id: existingSlot.id },
+        data: { durationMinutes: slot.durationMinutes, isActive: true },
+      });
+    } else {
+      await prisma.availabilitySlot.create({
+        data: { ...slot, isActive: true },
+      });
+    }
+  }
+
+  console.info(`✔️ Availability slots configured: ${availabilitySlots.length}`);
 }
 
 main()
