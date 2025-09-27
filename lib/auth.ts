@@ -1,5 +1,4 @@
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getFirebaseAdmin } from "./firebase-admin";
 import { prisma } from "./db";
 
@@ -12,12 +11,11 @@ export type SessionUser = {
 };
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
-  const cookieStore = cookies();
-  const token = cookieStore.get("session")?.value;
+  const token = cookies().get("session")?.value;
   if (!token) return null;
   try {
     const auth = getFirebaseAdmin();
-    const decoded = await auth.verifySessionCookie(token, true);
+    const decoded = await auth.verifyIdToken(token);
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
     });
@@ -31,31 +29,6 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     };
   } catch (error) {
     console.error("Failed to resolve current user", error);
-    const code =
-      (typeof error === "object" && error && "code" in error
-        ? (error as { code?: string }).code
-        : undefined) ??
-      (typeof error === "object" && error && "errorInfo" in error
-        ? (error as { errorInfo?: { code?: string } }).errorInfo?.code
-        : undefined);
-    if (
-      code === "auth/id-token-expired" ||
-      code === "auth/session-cookie-expired" ||
-      code === "auth/session-cookie-revoked"
-    ) {
-      cookieStore.delete("session");
-    }
-    const requestHeaders = headers();
-    const currentPath = requestHeaders.get("next-url") ?? "";
-    if (!currentPath.startsWith("/api")) {
-      if (currentPath.startsWith("/admin")) {
-        if (!currentPath.startsWith("/admin/login")) {
-          redirect("/admin/login");
-        }
-      } else if (!currentPath.startsWith("/login")) {
-        redirect("/login");
-      }
-    }
     return null;
   }
 }
