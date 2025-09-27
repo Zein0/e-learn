@@ -51,9 +51,15 @@ export default async function DiscoveryPage() {
                 placeholder={discovery.form.fields.email.placeholder}
               />
             </div>
-            <div className="grid gap-2 text-sm text-brand-600">
-              <Label htmlFor="time">{discovery.form.fields.time.label}</Label>
-              <Input id="time" type="datetime-local" name="time" step={60} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 text-sm text-brand-600">
+                <Label htmlFor="discovery-date">{discovery.form.fields.time.dateLabel}</Label>
+                <Input id="discovery-date" type="date" name="date" />
+              </div>
+              <div className="grid gap-2 text-sm text-brand-600">
+                <Label htmlFor="discovery-time">{discovery.form.fields.time.timeLabel}</Label>
+                <Input id="discovery-time" type="time" name="time" step={3600} />
+              </div>
             </div>
             <Button className="w-full" size="lg">
               {discovery.form.submit}
