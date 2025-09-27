@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,20 @@ type AvailabilityResponse = {
   slots: { startAt: string; endAt: string }[];
 };
 
+type DayEntry = {
+  key: string;
+  label: string;
+  date: Date;
+  slots: { startAt: string; endAt: string; label: string }[];
+};
+
+type MonthEntry = {
+  key: string;
+  year: number;
+  month: number;
+  label: string;
+};
+
 export function AvailabilityPicker({ value, onChange, locale, sessions, dictionary }: AvailabilityPickerProps) {
   const availabilityQuery = useQuery<AvailabilityResponse>({
     queryKey: ["availability"],
@@ -31,21 +45,21 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
     },
   });
 
+  const dayKeyFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: SYSTEM_TIMEZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }),
+    [],
+  );
+
   const groupedByDay = useMemo(() => {
     if (!availabilityQuery.data?.slots) {
-      return [] as {
-        label: string;
-        date: Date;
-        slots: { startAt: string; endAt: string; label: string }[];
-      }[];
+      return [] as DayEntry[];
     }
-
-    const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: SYSTEM_TIMEZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
 
     const dayLabelFormatter = new Intl.DateTimeFormat(locale, {
       timeZone: SYSTEM_TIMEZONE,
@@ -61,20 +75,14 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       hour12: false,
     });
 
-    const map = new Map<
-      string,
-      {
-        label: string;
-        date: Date;
-        slots: { startAt: string; endAt: string; label: string }[];
-      }
-    >();
+    const map = new Map<string, DayEntry>();
 
     availabilityQuery.data.slots.forEach((slot) => {
       const startDate = new Date(slot.startAt);
       const key = dayKeyFormatter.format(startDate);
       if (!map.has(key)) {
         map.set(key, {
+          key,
           label: dayLabelFormatter.format(startDate),
           date: startDate,
           slots: [],
@@ -93,7 +101,91 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
         slots: entry.slots.sort((a, b) => (a.startAt < b.startAt ? -1 : 1)),
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  }, [availabilityQuery.data, locale]);
+  }, [availabilityQuery.data, dayKeyFormatter, locale]);
+
+  const dayMap = useMemo(() => {
+    return new Map(groupedByDay.map((day) => [day.key, day]));
+  }, [groupedByDay]);
+
+  const months = useMemo(() => {
+    if (!groupedByDay.length) return [] as MonthEntry[];
+
+    const monthFormatter = new Intl.DateTimeFormat(locale, {
+      timeZone: SYSTEM_TIMEZONE,
+      month: "long",
+      year: "numeric",
+    });
+
+    const map = new Map<string, MonthEntry>();
+
+    groupedByDay.forEach((day) => {
+      const year = day.date.getFullYear();
+      const month = day.date.getMonth();
+      const key = `${year}-${String(month + 1).padStart(2, "0")}`;
+      if (!map.has(key)) {
+        const sample = new Date(year, month, 1);
+        map.set(key, {
+          key,
+          year,
+          month,
+          label: monthFormatter.format(sample),
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => {
+      if (a.year === b.year) {
+        return a.month - b.month;
+      }
+      return a.year - b.year;
+    });
+  }, [groupedByDay, locale]);
+
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
+  const [selectedDayKey, setSelectedDayKey] = useState<string | undefined>();
+
+  const weekdayLabels = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, {
+      timeZone: SYSTEM_TIMEZONE,
+      weekday: "short",
+    });
+    const reference = new Date(Date.UTC(2024, 0, 7));
+    return Array.from({ length: 7 }).map((_, index) => {
+      const day = new Date(reference);
+      day.setUTCDate(reference.getUTCDate() + index);
+      return formatter.format(day).toUpperCase();
+    });
+  }, [locale]);
+
+  useEffect(() => {
+    setCurrentMonthIndex((prev) => {
+      if (!months.length) return 0;
+      return Math.min(prev, Math.max(months.length - 1, 0));
+    });
+  }, [months.length]);
+
+  useEffect(() => {
+    if (!value) return;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return;
+    const key = dayKeyFormatter.format(parsed);
+    setSelectedDayKey(key);
+    const monthKey = key.slice(0, 7);
+    const monthIndex = months.findIndex((month) => month.key === monthKey);
+    if (monthIndex !== -1) {
+      setCurrentMonthIndex(monthIndex);
+    }
+  }, [value, dayKeyFormatter, months]);
+
+  useEffect(() => {
+    if (!selectedDayKey) return;
+    if (!dayMap.has(selectedDayKey)) {
+      setSelectedDayKey(undefined);
+      if (value) {
+        onChange(undefined);
+      }
+    }
+  }, [dayMap, onChange, selectedDayKey, value]);
 
   const selectedSlot = useMemo(() => {
     if (!value || !availabilityQuery.data?.slots) return undefined;
@@ -122,6 +214,58 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       .replace("{{time}}", timeLabel);
   }, [selectedSlot, dictionary.selected, sessions, locale]);
 
+  const currentMonth = months[currentMonthIndex];
+
+  const calendarDays = useMemo(() => {
+    if (!currentMonth) return [] as {
+      key: string;
+      date: Date;
+      slotsCount: number;
+      isCurrentMonth: boolean;
+      isSelected: boolean;
+      isDisabled: boolean;
+    }[];
+
+    const monthStart = new Date(currentMonth.year, currentMonth.month, 1);
+    const start = new Date(monthStart);
+    start.setDate(start.getDate() - start.getDay());
+
+    return Array.from({ length: 42 }).map((_, index) => {
+      const dayDate = new Date(start);
+      dayDate.setDate(start.getDate() + index);
+      const key = dayKeyFormatter.format(dayDate);
+      const dayEntry = dayMap.get(key);
+      const slotsCount = dayEntry?.slots.length ?? 0;
+      const isCurrentMonth = dayDate.getMonth() === currentMonth.month;
+      const isSelected = selectedDayKey === key;
+      const isDisabled = slotsCount === 0;
+      return {
+        key,
+        date: dayDate,
+        slotsCount,
+        isCurrentMonth,
+        isSelected,
+        isDisabled,
+      };
+    });
+  }, [currentMonth, dayKeyFormatter, dayMap, selectedDayKey]);
+
+  const selectedDay = selectedDayKey ? dayMap.get(selectedDayKey) : undefined;
+
+  const canGoPrev = currentMonthIndex > 0;
+  const canGoNext = currentMonthIndex < months.length - 1;
+
+  const handleDaySelect = (dayKey: string) => {
+    if (selectedDayKey !== dayKey) {
+      setSelectedDayKey(dayKey);
+    }
+    const dayEntry = dayMap.get(dayKey);
+    if (!dayEntry) return;
+    if (!dayEntry.slots.some((slot) => slot.startAt === value)) {
+      onChange(undefined);
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-3xl border border-brand-100 bg-white/80 p-4">
       <div className="space-y-1">
@@ -136,30 +280,101 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
       ) : groupedByDay.length === 0 ? (
         <p className="rounded-2xl bg-brand-50/70 p-4 text-sm text-brand-500">{dictionary.empty}</p>
       ) : (
-        <div className="max-h-[420px] overflow-y-auto pr-1">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {groupedByDay.map((day) => (
-              <div key={day.label} className="rounded-2xl border border-brand-100 bg-brand-50/40 p-3">
-                <p className="text-sm font-semibold text-brand-700">{day.label}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {day.slots.map((slot) => {
-                    const isSelected = value === slot.startAt;
-                    return (
-                      <Button
-                        key={slot.startAt}
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        size="sm"
-                        className="rounded-2xl px-4"
-                        onClick={() => onChange(isSelected ? undefined : slot.startAt)}
-                      >
-                        {slot.label}
-                      </Button>
-                    );
-                  })}
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <div className="rounded-3xl border border-brand-100 bg-white/70 p-4 shadow-sm lg:flex-1">
+            <div className="mb-4 flex items-center justify-between">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={!canGoPrev}
+                onClick={() => canGoPrev && setCurrentMonthIndex((index) => Math.max(index - 1, 0))}
+                className="h-8 w-8 rounded-full p-0 text-lg"
+              >
+                &lsaquo;
+              </Button>
+              <p className="text-sm font-semibold text-brand-700">{currentMonth?.label}</p>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={!canGoNext}
+                onClick={() => canGoNext && setCurrentMonthIndex((index) => Math.min(index + 1, months.length - 1))}
+                className="h-8 w-8 rounded-full p-0 text-lg"
+              >
+                &rsaquo;
+              </Button>
+            </div>
+            <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-400">
+              {weekdayLabels.map((weekday) => (
+                <span key={weekday}>{weekday}</span>
+              ))}
+            </div>
+            <div className="mt-2 grid grid-cols-7 gap-2">
+              {calendarDays.map((day) => {
+                const isSelected = day.isSelected;
+                const baseClasses =
+                  "flex h-20 flex-col items-center justify-center rounded-2xl border text-sm transition";
+                const stateClasses = day.isDisabled
+                  ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
+                  : isSelected
+                    ? "border-brand-500 bg-brand-500 text-white shadow-md"
+                    : day.isCurrentMonth
+                      ? "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50"
+                      : "border-transparent bg-brand-50/30 text-brand-300";
+                return (
+                  <button
+                    key={`${day.key}-${day.date.getDate()}`}
+                    type="button"
+                    disabled={day.isDisabled}
+                    onClick={() => handleDaySelect(day.key)}
+                    className={`${baseClasses} ${stateClasses}`}
+                  >
+                    <span className="text-base font-semibold">{day.date.getDate()}</span>
+                    <span
+                      className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
+                        isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
+                      }`}
+                    >
+                      {day.slotsCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-brand-100 bg-white/70 p-4 shadow-sm lg:w-[320px] xl:w-[360px]">
+            {selectedDay ? (
+              <div className="flex h-full flex-col">
+                <div className="space-y-1 border-b border-brand-100 pb-3">
+                  <p className="text-sm font-semibold text-brand-700">{selectedDay.label}</p>
+                  <p className="text-xs text-brand-500">{dictionary.description}</p>
+                </div>
+                <div className="mt-3 flex-1 overflow-y-auto pr-1">
+                  <div className="flex flex-col gap-2">
+                    {selectedDay.slots.map((slot) => {
+                      const isSelected = value === slot.startAt;
+                      return (
+                        <Button
+                          key={slot.startAt}
+                          type="button"
+                          variant={isSelected ? "default" : "outline"}
+                          className="w-full justify-between rounded-2xl px-4"
+                          onClick={() => onChange(isSelected ? undefined : slot.startAt)}
+                        >
+                          <span>{slot.label}</span>
+                          {isSelected && <span className="text-xs font-semibold uppercase">✓</span>}
+                        </Button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            ))}
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-2xl bg-brand-50/70 p-6 text-center text-sm text-brand-500">
+                {dictionary.description}
+              </div>
+            )}
           </div>
         </div>
       )}
