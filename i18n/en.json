@@ -179,13 +179,21 @@
       },
       "details": {
         "title": "Additional details",
-        "description": "Choose how we determine your level and add your preferred time.",
+        "description": "Choose how we determine your level and pick your weekly session time.",
         "placementQuestion": "How should we determine your level?",
-        "levelLabel": "Current level",
+        "levelLabel": "Current level (optional)",
         "levelPlaceholder": "Example: Intermediate B1",
-        "slotLabel": "Preferred time (local timezone)",
-        "notesLabel": "Notes",
-        "notesPlaceholder": "Share goals or preferences that help us prepare."
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Share goals or preferences that help us prepare.",
+        "availability": {
+          "title": "Select your weekly slot",
+          "description": "Choose one available time. We will repeat it every week for the duration of your plan.",
+          "loading": "Loading available times...",
+          "empty": "No upcoming slots are available right now. Please check back soon or contact support.",
+          "timezone": "Times shown in {{timezone}}.",
+          "selected": "Your {{count}} sessions will start on {{date}} at {{time}} and repeat every week.",
+          "sessionsNote": "Weekly sessions are locked once you confirm your booking."
+        }
       },
       "summary": {
         "title": "Booking summary",
@@ -219,6 +227,7 @@
       "appointments": "Appointments",
       "calendar": "Calendar",
       "catalog": "Catalog",
+      "availability": "Availability slots",
       "reports": "Reports",
       "cashBooking": "Cash bookings",
       "users": "Learners"
@@ -379,6 +388,27 @@
       "monthOf": "Month of",
       "noSessions": "No sessions",
       "sessionAt": "Time"
+    },
+    "availability": {
+      "title": "Availability schedule",
+      "description": "Select the weekly hours that learners can book.",
+      "instructions": "Toggle the hours you are available. Each slot equals a one-hour session repeating weekly.",
+      "timezoneNote": "Times are shown in {{timezone}}.",
+      "weekdays": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "hourLabel": "{{time}}",
+      "clearAction": "Clear all",
+      "saveAction": "Save availability",
+      "savingAction": "Saving...",
+      "success": "Availability updated",
+      "empty": "No hours selected yet. Learners will see an empty calendar."
     },
     "reports": {
       "title": "Reports",

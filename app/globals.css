@@ -27,7 +27,7 @@ body {
 }
 
 .card-gradient {
-  background: linear-gradient(135deg, rgba(62, 132, 103, 0.12), rgba(156, 118, 64, 0.12));
+  background: linear-gradient(135deg, rgba(0, 128, 128, 0.14), rgba(163, 144, 77, 0.12));
 }
 
 .shadow-soft {

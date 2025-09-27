@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTr
 import { Textarea } from "@/components/ui/textarea";
 import type { BookingCourse, BookingDictionary } from "@/lib/types/booking";
 import { useBookingStore } from "@/stores/booking";
+import { AvailabilityPicker } from "./availability-picker";
 
 const CURRENCY_CODE = "USD";
 
@@ -454,15 +455,13 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                   />
                 </div>
               )}
-              <div className="grid gap-2">
-                <Label htmlFor="slot">{dictionary.form.details.slotLabel}</Label>
-                <Input
-                  id="slot"
-                  type="datetime-local"
-                  value={slotStartAt ?? ""}
-                  onChange={(event) => setField("slotStartAt", event.target.value)}
-                />
-              </div>
+              <AvailabilityPicker
+                value={slotStartAt}
+                onChange={(next) => setField("slotStartAt", next)}
+                locale={locale}
+                sessions={sessionsTotal || 1}
+                dictionary={dictionary.form.details.availability}
+              />
               <div className="grid gap-2">
                 <Label htmlFor="notes">{dictionary.form.details.notesLabel}</Label>
                 <Textarea

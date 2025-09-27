@@ -27,6 +27,26 @@ export type AdminCatalogCourse = {
   }[];
 };
 
+export type AdminAvailabilitySlot = {
+  dayOfWeek: number;
+  startMinutes: number;
+  durationMinutes: number;
+};
+
+export type AdminAvailabilityDictionary = {
+  title: string;
+  description: string;
+  instructions: string;
+  timezoneNote: string;
+  weekdays: string[];
+  hourLabel: string;
+  clearAction: string;
+  saveAction: string;
+  savingAction: string;
+  success: string;
+  empty: string;
+};
+
 export type AdminCatalogDictionary = {
   title: string;
   description: string;
@@ -148,6 +168,7 @@ export type AdminDictionary = {
     reports: string;
     cashBooking: string;
     users: string;
+    availability: string;
   };
   roles: Record<string, string>;
   layout: AdminLayoutDictionary;
@@ -164,6 +185,7 @@ export type AdminDictionary = {
     noSessions: string;
     sessionAt: string;
   };
+  availability: AdminAvailabilityDictionary;
   reports: {
     title: string;
     description: string;
