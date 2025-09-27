@@ -65,8 +65,10 @@ model User {
 
 model Course {
   id            String            @id @default(uuid())
-  title         String            @unique
-  description   String
+  titleEn       String            @unique
+  titleAr       String
+  descriptionEn String
+  descriptionAr String
   type          CourseType
   category      String
   difficulties  CourseDifficulty[]

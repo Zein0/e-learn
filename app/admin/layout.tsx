@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AdminLanguageInitializer } from "@/components/admin/admin-language-initializer";
 import { getCurrentUser } from "@/lib/auth";
-import { getDictionary } from "@/lib/i18n";
-import type { Locale } from "@/lib/i18n";
+import { getDictionary, getLocale } from "@/lib/i18n";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -12,7 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/login");
   }
 
-  const locale: Locale = "en";
+  const locale = await getLocale();
   const dictionary = await getDictionary(locale);
   const navItems = [
     { href: "/admin", label: dictionary.admin.nav.overview },
@@ -26,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-      <AdminLanguageInitializer />
+      <AdminLanguageInitializer locale={locale} />
       <aside className="h-fit rounded-3xl bg-white/80 p-6 shadow-soft ring-1 ring-brand-100">
         <div className="space-y-6">
           <div>

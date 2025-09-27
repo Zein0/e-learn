@@ -21,23 +21,29 @@ async function main() {
   console.info(`✔️ Admin user ready: ${admin.email}`);
 
   const conversationCourse = await prisma.course.upsert({
-    where: { title: "دورة المحادثة المكثفة" },
+    where: { titleEn: "Intensive Conversation Program" },
     update: {
-      description:
+      titleAr: "دورة المحادثة المكثفة",
+      descriptionEn:
+        "Practical coaching that strengthens speaking fluency through real-life scenarios and guided workshops.",
+      descriptionAr:
         "برنامج عملي يركز على تحسين الطلاقة في التحدث من خلال مواقف حياتية وورش عمل مع المدرب.",
       category: "مهارات المحادثة",
       type: CourseType.PRIVATE,
     },
     create: {
-      title: "دورة المحادثة المكثفة",
-      description:
+      titleEn: "Intensive Conversation Program",
+      titleAr: "دورة المحادثة المكثفة",
+      descriptionEn:
+        "Practical coaching that strengthens speaking fluency through real-life scenarios and guided workshops.",
+      descriptionAr:
         "برنامج عملي يركز على تحسين الطلاقة في التحدث من خلال مواقف حياتية وورش عمل مع المدرب.",
       category: "مهارات المحادثة",
       type: CourseType.PRIVATE,
     },
   });
 
-  console.info(`✔️ Course ready: ${conversationCourse.title}`);
+  console.info(`✔️ Course ready: ${conversationCourse.titleEn} / ${conversationCourse.titleAr}`);
 
   const difficultyData = [
     { label: DifficultyLabel.BEGINNER, pricePerSession: "20.00" },

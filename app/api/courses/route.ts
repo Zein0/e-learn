@@ -10,7 +10,7 @@ export async function GET() {
         difficulties: true,
         topics: { orderBy: { order: "asc" } },
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
     const payload = courses.map((course) => ({
       ...course,

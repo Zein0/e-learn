@@ -1,8 +1,7 @@
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 
 import { prisma } from "@/lib/db";
-import { getDictionary } from "@/lib/i18n";
-import type { Locale } from "@/lib/i18n";
+import { getDictionary, getLocale } from "@/lib/i18n";
 import type { AdminDictionary } from "@/lib/types/admin";
 import { AdminCalendar } from "@/components/admin/calendar/admin-calendar";
 
@@ -21,7 +20,7 @@ type CalendarAppointment = {
 };
 
 export default async function AdminCalendarPage() {
-  const locale: Locale = "en";
+  const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
   const now = new Date();
@@ -48,7 +47,7 @@ export default async function AdminCalendarPage() {
     appointments = records.map((record) => ({
       id: record.id,
       learner: record.user.name ?? record.user.email,
-      course: record.course.title,
+      course: locale === "ar" ? record.course.titleAr : record.course.titleEn,
       topic: record.topic?.name ?? null,
       startAt: record.startAt.toISOString(),
       endAt: record.endAt.toISOString(),

@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/db";
-import { getDictionary } from "@/lib/i18n";
-import type { Locale } from "@/lib/i18n";
+import { getDictionary, getLocale } from "@/lib/i18n";
 import type { AdminCatalogCourse } from "@/lib/types/admin";
 import { CatalogManager } from "@/components/admin/catalog/catalog-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCatalogPage() {
-  const locale: Locale = "en";
+  const locale = await getLocale();
   const dictionary = await getDictionary(locale);
 
   let courses: AdminCatalogCourse[] = [];
@@ -17,13 +16,13 @@ export default async function AdminCatalogPage() {
         difficulties: true,
         topics: true,
       },
-      orderBy: { title: "asc" },
+      orderBy: { titleEn: "asc" },
     });
 
     courses = records.map((course) => ({
       id: course.id,
-      title: course.title,
-      description: course.description,
+      title: { en: course.titleEn, ar: course.titleAr },
+      description: { en: course.descriptionEn, ar: course.descriptionAr },
       type: course.type,
       category: course.category,
       difficulties: course.difficulties.map((difficulty) => ({
@@ -31,15 +30,18 @@ export default async function AdminCatalogPage() {
         label: difficulty.label,
         pricePerSession: Number(difficulty.pricePerSession),
       })),
-      topics: course.topics.map((topic) => ({
-        id: topic.id,
-        name: topic.name,
-        description: topic.description,
-        sessionsRequired: topic.sessionsRequired,
-        estimatedHours: topic.estimatedHours,
-        order: topic.order,
-        difficultyId: topic.difficultyId,
-      })),
+      topics: course.topics
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map((topic) => ({
+          id: topic.id,
+          name: topic.name,
+          description: topic.description,
+          sessionsRequired: topic.sessionsRequired,
+          estimatedHours: topic.estimatedHours,
+          order: topic.order,
+          difficultyId: topic.difficultyId,
+        })),
     }));
   } catch (error) {
     console.error("Failed to load catalog", error);

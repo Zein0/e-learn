@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma, AppointmentStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { getLocale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export async function GET(request: Request) {
   }
 
   try {
+    const locale = await getLocale();
     const appointments = await prisma.appointment.findMany({
       where,
       include: { course: true, user: true },
@@ -42,7 +44,7 @@ export async function GET(request: Request) {
       startAt: appointment.startAt.toISOString(),
       endAt: appointment.endAt.toISOString(),
       status: appointment.status,
-      course: appointment.course.title,
+      course: locale === "ar" ? appointment.course.titleAr : appointment.course.titleEn,
       learner: appointment.user.name ?? appointment.user.email,
       notes: appointment.teacherNotes,
     }));

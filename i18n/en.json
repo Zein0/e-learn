@@ -262,17 +262,31 @@
     "catalog": {
       "title": "Catalog management",
       "description": "Maintain courses, difficulties, and topics in one workspace.",
-      "createCourse": {
-        "title": "Create a course",
-        "nameLabel": "Course name",
-        "descriptionLabel": "Description",
+      "list": {
+        "searchPlaceholder": "Search courses by English name",
+        "addAction": "Add course",
+        "emptyTitle": "No courses yet",
+        "emptyDescription": "Create your first course to start publishing learning paths.",
+        "pageLabel": "Page {{current}} of {{total}}",
+        "viewAction": "View details"
+      },
+      "forms": {
+        "nameEnLabel": "Course name (English)",
+        "nameArLabel": "Course name (Arabic)",
+        "descriptionEnLabel": "Description (English)",
+        "descriptionArLabel": "Description (Arabic)",
         "categoryLabel": "Category",
         "typeLabel": "Course type",
         "typeOptions": {
           "PRIVATE": "Private",
           "CLASSROOM": "Classroom"
         },
-        "submit": "Save course"
+        "submit": "Save course",
+        "cancel": "Cancel"
+      },
+      "createCourse": {
+        "title": "Create a course",
+        "description": "Add English and Arabic details before publishing the course."
       },
       "updateCourse": {
         "editAction": "Edit",
@@ -283,25 +297,49 @@
         "type": "Course type",
         "category": "Category"
       },
+      "courseDetail": {
+        "backToList": "Back to catalog",
+        "overviewTitle": "Course overview",
+        "englishHeading": "English content",
+        "arabicHeading": "Arabic content",
+        "descriptionHeading": "Description",
+        "metadataTitle": "Course information",
+        "typeLabel": "Type",
+        "categoryLabel": "Category",
+        "summaryTitle": "Difficulty summary",
+        "summaryDescription": "Review pricing and topic counts for each level.",
+        "difficultiesCountLabel": "{{count}} difficulty levels",
+        "topicsCountLabel": "{{count}} topics",
+        "manageDifficulties": "Manage difficulties",
+        "editAction": "Edit course",
+        "saveAction": "Save changes",
+        "cancelAction": "Cancel"
+      },
       "difficulty": {
         "title": "Difficulties",
-        "existingTitle": "Active difficulty levels with session pricing.",
+        "description": "Create levels specific to this course and maintain pricing in USD.",
+        "existingTitle": "Difficulty levels",
         "priceLabel": "Session price (USD)",
         "addTitle": "Add difficulty",
         "labelPlaceholder": "Select level",
         "pricePlaceholder": "e.g. 25",
-        "submit": "Add difficulty",
+        "submit": "Save difficulty",
         "labels": {
           "BEGINNER": "Beginner",
           "INTERMEDIATE": "Intermediate",
           "ADVANCED": "Advanced"
-        }
+        },
+        "backToCourse": "Back to course",
+        "manageTopics": "Manage topics",
+        "empty": "No difficulties have been added yet.",
+        "pageLabel": "Showing {{from}}–{{to}} of {{total}} difficulties"
       },
       "topics": {
         "title": "Topics",
         "empty": "No topics have been added yet.",
         "addButton": "Add topic",
         "formTitle": "New topic",
+        "editTitle": "Edit topic",
         "nameLabel": "Topic name",
         "descriptionLabel": "Description",
         "sessionsLabel": "Sessions",
@@ -311,7 +349,9 @@
         "cancel": "Cancel",
         "editAction": "Edit",
         "moveUp": "Move up",
-        "moveDown": "Move down"
+        "moveDown": "Move down",
+        "backToDifficulties": "Back to difficulties",
+        "pageLabel": "Page {{current}} of {{total}}"
       },
       "feedback": {
         "courseCreated": "Course created",

@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/db";
+import { getLocale } from "@/lib/i18n";
 import { AppointmentsTable, type AdminAppointment } from "@/components/admin/appointments-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminAppointmentsPage() {
+  const locale = await getLocale();
   let appointments: AdminAppointment[] = [];
   try {
     const records = await prisma.appointment.findMany({
@@ -19,7 +21,7 @@ export default async function AdminAppointmentsPage() {
     appointments = records.map((appointment) => ({
       id: appointment.id,
       learner: appointment.user.name ?? appointment.user.email,
-      course: appointment.course.title,
+      course: locale === "ar" ? appointment.course.titleAr : appointment.course.titleEn,
       topic: appointment.topic?.name ?? "—",
       startAt: appointment.startAt.toISOString(),
       endAt: appointment.endAt.toISOString(),

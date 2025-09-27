@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 import { applyLocaleToDocument } from "@/lib/locale-client";
+import type { Locale } from "@/lib/i18n-config";
 import { usePreferencesStore } from "@/stores/preferences";
 
-export function AdminLanguageInitializer() {
-  const router = useRouter();
+type AdminLanguageInitializerProps = {
+  locale: Locale;
+};
+
+export function AdminLanguageInitializer({ locale }: AdminLanguageInitializerProps) {
   const initializedRef = useRef(false);
   const language = usePreferencesStore((state) => state.language);
   const setLanguage = usePreferencesStore((state) => state.setLanguage);
@@ -17,20 +20,19 @@ export function AdminLanguageInitializer() {
       return;
     }
 
-    if (language !== "en") {
-      initializedRef.current = true;
-      setLanguage("en");
-      applyLocaleToDocument("en");
-
-      fetch("/api/locale", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale: "en" }),
-      }).finally(() => {
-        router.refresh();
-      });
+    initializedRef.current = true;
+    if (language !== locale) {
+      setLanguage(locale);
     }
-  }, [language, router, setLanguage]);
+    applyLocaleToDocument(locale);
+  }, [language, locale, setLanguage]);
+
+  useEffect(() => {
+    if (language !== locale) {
+      setLanguage(locale);
+      applyLocaleToDocument(locale);
+    }
+  }, [language, locale, setLanguage]);
 
   return null;
 }
