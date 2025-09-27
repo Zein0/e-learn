@@ -6,6 +6,7 @@ import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { LOCALE_COOKIE } from "@/lib/i18n-config";
 
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const SESSION_MAX_AGE_MS = SESSION_MAX_AGE * 1000;
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const auth = getFirebaseAdmin();
-    const decoded = await auth.verifyIdToken(idToken);
+    const decoded = await auth.verifyIdToken(idToken, true);
 
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
@@ -27,7 +28,11 @@ export async function POST(request: Request) {
     }
 
     const cookieStore = cookies();
-    cookieStore.set("session", idToken, {
+    const sessionCookie = await auth.createSessionCookie(idToken, {
+      expiresIn: SESSION_MAX_AGE_MS,
+    });
+
+    cookieStore.set("session", sessionCookie, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",

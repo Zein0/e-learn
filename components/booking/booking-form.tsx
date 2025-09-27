@@ -429,23 +429,27 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
               <CardDescription>{dictionary.form.details.description}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label>{dictionary.form.details.placementQuestion}</Label>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {placementOptions
-                    .filter((option) => knowsLevel || option.value !== "KNOWN_LEVEL")
-                    .map((option) => (
-                      <Button
-                        key={option.value}
-                        type="button"
-                        variant={placementChoice === option.value ? "default" : "outline"}
-                        onClick={() => setField("placementChoice", option.value)}
-                      >
-                        {option.label}
-                      </Button>
-                    ))}
+              {typeof knowsLevel === "boolean" && (
+                <div className="grid gap-2">
+                  <Label className="block text-sm font-semibold text-brand-700">
+                    {dictionary.form.details.placementQuestion}
+                  </Label>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {placementOptions
+                      .filter((option) => knowsLevel || option.value !== "KNOWN_LEVEL")
+                      .map((option) => (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant={placementChoice === option.value ? "default" : "outline"}
+                          onClick={() => setField("placementChoice", option.value)}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
               {placementChoice === "KNOWN_LEVEL" && knowsLevel && (
                 <div className="grid gap-2">
                   <Label htmlFor="level">{dictionary.form.details.levelLabel}</Label>
