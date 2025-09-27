@@ -60,7 +60,7 @@ export function LanguageSwitch({ locale, labels }: LanguageSwitchProps) {
 
   return (
     <div className="flex items-center gap-2 text-xs font-medium text-brand-600">
-      <span className="hidden sm:inline">{labels.title}</span>
+      {/* <span className="hidden sm:inline">{labels.title}</span> */}
       <div className="flex items-center gap-1 rounded-full border border-emerald-500/40 bg-white/60 p-1 backdrop-blur dark:bg-brand-900/60">
         {SUPPORTED_LOCALES.map((itemLocale) => {
           const isActive = itemLocale === locale;

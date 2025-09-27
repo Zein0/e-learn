@@ -200,7 +200,7 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
 
     const rangeFormatter = new Intl.DateTimeFormat(locale, {
       timeZone: SYSTEM_TIMEZONE,
-      month: "long",
+      month: "short",
       day: "numeric",
     });
 
@@ -335,17 +335,15 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
     }[];
 
     const monthStart = new Date(currentMonth.year, currentMonth.month, 1);
-    const start = new Date(monthStart);
-    const offset = (start.getDay() + 6) % 7;
-    start.setDate(start.getDate() - offset);
+    const monthEnd = new Date(currentMonth.year, currentMonth.month + 1, 0);
+    const daysInMonth = monthEnd.getDate();
 
-    return Array.from({ length: 42 }).map((_, index) => {
-      const dayDate = new Date(start);
-      dayDate.setDate(start.getDate() + index);
+    return Array.from({ length: daysInMonth }).map((_, index) => {
+      const dayDate = new Date(currentMonth.year, currentMonth.month, index + 1);
       const key = dayKeyFormatter.format(dayDate);
       const dayEntry = dayMap.get(key);
       const slotsCount = dayEntry?.slots.length ?? 0;
-      const isCurrentMonth = dayDate.getMonth() === currentMonth.month;
+      const isCurrentMonth = true; // Always true now since we only show current month days
       const isSelected = selectedDayKey === key;
       const isDisabled = slotsCount === 0;
       return {
@@ -476,36 +474,52 @@ export function AvailabilityPicker({ value, onChange, locale, sessions, dictiona
             </div>
             {viewMode === "month" ? (
               <div className="mt-2 grid grid-cols-7 gap-2">
-                {calendarDays.map((day) => {
-                  const isSelected = day.isSelected;
-                  const baseClasses =
-                    "flex h-20 flex-col items-center justify-center rounded-2xl border text-sm transition";
-                  const stateClasses = day.isDisabled
-                    ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
-                    : isSelected
-                      ? "border-brand-500 bg-brand-500 text-white shadow-md"
-                      : day.isCurrentMonth
-                        ? "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50"
-                        : "border-transparent bg-brand-50/30 text-brand-300";
-                  return (
-                    <button
-                      key={`${day.key}-${day.date.getDate()}`}
-                      type="button"
-                      disabled={day.isDisabled}
-                      onClick={() => handleDaySelect(day.key)}
-                      className={`${baseClasses} ${stateClasses}`}
-                    >
-                      <span className="text-base font-semibold">{day.date.getDate()}</span>
-                      <span
-                        className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
-                          isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
-                        }`}
+                {(() => {
+                  const firstDay = new Date(currentMonth.year, currentMonth.month, 1);
+                  const startDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+                  const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
+                  const totalCells = Math.ceil((startDayOfWeek + daysInMonth) / 7) * 7;
+                  
+                  return Array.from({ length: totalCells }).map((_, index) => {
+                    if (index < startDayOfWeek || index >= startDayOfWeek + daysInMonth) {
+                      // Empty cell for days before month starts or after month ends
+                      return <div key={`empty-${index}`} className="h-20" />;
+                    }
+                    
+                    const dayNumber = index - startDayOfWeek + 1;
+                    const day = calendarDays[dayNumber - 1];
+                    
+                    if (!day) return <div key={`missing-${index}`} className="h-20" />;
+                    
+                    const isSelected = day.isSelected;
+                    const baseClasses =
+                      "flex h-20 flex-col items-center justify-center rounded-2xl border text-sm transition";
+                    const stateClasses = day.isDisabled
+                      ? "cursor-not-allowed border-dashed border-brand-100 bg-brand-50/60 text-brand-300"
+                      : isSelected
+                        ? "border-brand-500 bg-brand-500 text-white shadow-md"
+                        : "border-brand-100 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50";
+                    
+                    return (
+                      <button
+                        key={`${day.key}-${day.date.getDate()}`}
+                        type="button"
+                        disabled={day.isDisabled}
+                        onClick={() => handleDaySelect(day.key)}
+                        className={`${baseClasses} ${stateClasses}`}
                       >
-                        {day.slotsCount}
-                      </span>
-                    </button>
-                  );
-                })}
+                        <span className="text-base font-semibold">{day.date.getDate()}</span>
+                        <span
+                          className={`mt-1 inline-flex min-w-[2rem] justify-center rounded-full px-2 py-1 text-[11px] font-medium ${
+                            isSelected ? "bg-white/90 text-brand-600" : "bg-brand-100 text-brand-600"
+                          }`}
+                        >
+                          {day.slotsCount}
+                        </span>
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             ) : (
               <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
