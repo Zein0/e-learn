@@ -114,7 +114,8 @@
           "placeholder": "you@example.com"
         },
         "time": {
-          "label": "Preferred time"
+          "dateLabel": "Preferred day",
+          "timeLabel": "Preferred hour"
         }
       },
       "submit": "Request call"
@@ -193,6 +194,13 @@
           "timezone": "Times shown in {{timezone}}.",
           "selected": "Your {{count}} sessions will start on {{date}} at {{time}} and repeat every week.",
           "sessionsNote": "Weekly sessions are locked once you confirm your booking."
+        },
+        "manualAvailability": {
+          "title": "Pick any convenient time",
+          "description": "Choose the day and hour that work best for your placement or discovery call.",
+          "dateLabel": "Preferred day",
+          "timeLabel": "Preferred hour",
+          "timezone": "Times shown in {{timezone}}."
         }
       },
       "summary": {

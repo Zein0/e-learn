@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { SYSTEM_TIMEZONE } from "@/lib/timezone";
 import type { BookingCourse, BookingDictionary } from "@/lib/types/booking";
 import { useBookingStore } from "@/stores/booking";
 import { AvailabilityPicker } from "./availability-picker";
@@ -70,6 +71,8 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
 
   const [couponCode, setCouponCode] = useState("");
   const [isSummaryOpen, setSummaryOpen] = useState(false);
+  const [manualDate, setManualDate] = useState("");
+  const [manualTime, setManualTime] = useState("");
 
   const placementOptions = useMemo(
     () =>
@@ -80,6 +83,16 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
       ],
     [dictionary.placementOptions],
   );
+
+  const availablePlacementOptions = useMemo(() => {
+    if (knowsLevel === true) {
+      return placementOptions.filter((option) => option.value === "KNOWN_LEVEL");
+    }
+    if (knowsLevel === false) {
+      return placementOptions.filter((option) => option.value !== "KNOWN_LEVEL");
+    }
+    return placementOptions;
+  }, [knowsLevel, placementOptions]);
 
   const selectedCourse = useMemo(() => courses.find((course) => course.id === courseId) ?? courses[0], [courses, courseId]);
   const difficulties = useMemo(() => selectedCourse?.difficulties ?? [], [selectedCourse]);
@@ -125,6 +138,24 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
     }
   }, [knowsLevel, placementChoice, setField]);
 
+  useEffect(() => {
+    if (knowsLevel !== false) {
+      setManualDate("");
+      setManualTime("");
+      return;
+    }
+    if (!slotStartAt) {
+      setManualDate("");
+      setManualTime("");
+      return;
+    }
+    const slotDate = new Date(slotStartAt);
+    if (!Number.isNaN(slotDate.getTime())) {
+      setManualDate(slotDate.toISOString().slice(0, 10));
+      setManualTime(slotDate.toISOString().slice(11, 16));
+    }
+  }, [knowsLevel, slotStartAt]);
+
   const topics = useMemo(
     () =>
       selectedDifficulty
@@ -140,6 +171,27 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
         .reduce((sum, topic) => sum + topic.sessionsRequired, 0),
     [topics, selectedTopicIds],
   );
+
+  const updateManualSlot = (nextDate: string, nextTime: string) => {
+    if (!nextDate || !nextTime) {
+      setField("slotStartAt", undefined);
+      return;
+    }
+    const composed = new Date(`${nextDate}T${nextTime}`);
+    if (!Number.isNaN(composed.getTime())) {
+      setField("slotStartAt", composed.toISOString());
+    }
+  };
+
+  const handleManualDateChange = (value: string) => {
+    setManualDate(value);
+    updateManualSlot(value, manualTime);
+  };
+
+  const handleManualTimeChange = (value: string) => {
+    setManualTime(value);
+    updateManualSlot(manualDate, value);
+  };
 
   const pricingQuery = useQuery<PricingResponse>({
     queryKey: [
@@ -435,18 +487,16 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                     {dictionary.form.details.placementQuestion}
                   </Label>
                   <div className="grid gap-2 sm:grid-cols-3">
-                    {placementOptions
-                      .filter((option) => knowsLevel || option.value !== "KNOWN_LEVEL")
-                      .map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={placementChoice === option.value ? "default" : "outline"}
-                          onClick={() => setField("placementChoice", option.value)}
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
+                    {availablePlacementOptions.map((option) => (
+                      <Button
+                        key={option.value}
+                        type="button"
+                        variant={placementChoice === option.value ? "default" : "outline"}
+                        onClick={() => setField("placementChoice", option.value)}
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               )}
@@ -461,13 +511,50 @@ export function BookingForm({ courses, locale, dictionary }: BookingFormProps) {
                   />
                 </div>
               )}
-              <AvailabilityPicker
-                value={slotStartAt}
-                onChange={(next) => setField("slotStartAt", next)}
-                locale={locale}
-                sessions={sessionsTotal || 1}
-                dictionary={dictionary.form.details.availability}
-              />
+              {knowsLevel === false ? (
+                <div className="space-y-4 rounded-3xl border border-brand-100 bg-white/80 p-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-brand-700">
+                      {dictionary.form.details.manualAvailability.title}
+                    </p>
+                    <p className="text-xs text-brand-500">
+                      {dictionary.form.details.manualAvailability.description}
+                    </p>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="manual-date">{dictionary.form.details.manualAvailability.dateLabel}</Label>
+                      <Input
+                        id="manual-date"
+                        type="date"
+                        value={manualDate}
+                        onChange={(event) => handleManualDateChange(event.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="manual-time">{dictionary.form.details.manualAvailability.timeLabel}</Label>
+                      <Input
+                        id="manual-time"
+                        type="time"
+                        step={3600}
+                        value={manualTime}
+                        onChange={(event) => handleManualTimeChange(event.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-brand-400">
+                    {dictionary.form.details.manualAvailability.timezone.replace("{{timezone}}", SYSTEM_TIMEZONE)}
+                  </p>
+                </div>
+              ) : (
+                <AvailabilityPicker
+                  value={slotStartAt}
+                  onChange={(next) => setField("slotStartAt", next)}
+                  locale={locale}
+                  sessions={sessionsTotal || 1}
+                  dictionary={dictionary.form.details.availability}
+                />
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="notes">{dictionary.form.details.notesLabel}</Label>
                 <Textarea

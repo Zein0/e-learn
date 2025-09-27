@@ -114,7 +114,8 @@
           "placeholder": "you@example.com"
         },
         "time": {
-          "label": "الوقت المقترح"
+          "dateLabel": "اليوم المفضل",
+          "timeLabel": "الساعة المفضلة"
         }
       },
       "submit": "حجز الجلسة"
@@ -193,6 +194,13 @@
           "timezone": "الأوقات معروضة حسب توقيت {{timezone}}.",
           "selected": "ستبدأ جلساتك {{count}} في {{date}} الساعة {{time}} وتتكرر أسبوعياً.",
           "sessionsNote": "يتم تثبيت المواعيد الأسبوعية بعد تأكيد الحجز."
+        },
+        "manualAvailability": {
+          "title": "اختر الوقت المناسب لك",
+          "description": "حدد اليوم والساعة الأنسب لاختبار التحديد أو الجلسة التعريفية.",
+          "dateLabel": "اليوم المفضل",
+          "timeLabel": "الساعة المفضلة",
+          "timezone": "الأوقات معروضة حسب توقيت {{timezone}}."
         }
       },
       "summary": {
